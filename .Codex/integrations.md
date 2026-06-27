@@ -19,6 +19,8 @@
 - **Channel URL**: https://app.slack.com/client/T0BD5UTDHB9/C0BEFPB13QQ
 - **공유 이벤트**: PR 생성·병합, 마일스톤, 릴리스, 주요 CI 실패, 블로커
 - **공유 제외**: 사소한 커밋, 로컬 중간 로그, 민감정보
+- **워크플로우 명세**: `.Codex/slack-workflows.md`
+- **적용 순서**: GitHub 알림 → 결정 요청 → 블로커 신고 → 주간 리뷰 → 채널 탭
 
 ## Codex
 
@@ -51,5 +53,6 @@ Codex 기준 세션 및 로컬 문서
 ## 보류 중인 연동
 
 - GitHub 서버 측 `main` 보호: GitHub Pro 전환 또는 저장소 공개 결정 필요
-- GitHub 앱 기반 Slack 자동 알림: Slack 워크스페이스 앱 설치·채널 구독 권한 필요
-- 위 두 기능이 준비되기 전에는 Codex 기준 세션이 PR·병합·CI 이벤트를 `#business_os`에 공유한다.
+- `OPS-002` GitHub 앱 기반 Slack 자동 알림: Slack 워크스페이스 앱 설치·비공개 저장소 구독 권한 필요
+- `OPS-003~OPS-006` Slack Workflow Builder와 채널 탭 구성: `.Codex/slack-workflows.md` 순서대로 적용
+- 위 연동이 준비되기 전에는 Codex 기준 세션이 PR·병합·CI 이벤트를 `#business_os`에 공유한다.
