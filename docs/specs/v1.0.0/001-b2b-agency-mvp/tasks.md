@@ -71,11 +71,11 @@
   - 상세: 공개 접수 성공/오류, 인박스 필터, 상태 변경과 고객 연결 UI를 만든다.
   - 완료 기준: 공개 제출부터 운영자 처리까지 E2E가 통과한다.
 
-- [ ] **T010** — S3 업로드 예약·확정과 파일 정책 구현 (T002, T003, T004 완료 후) `[P]`
-  - 구현 파일: `src/modules/file/schema.ts`, `repository.ts`, `service.ts`, `src/app/api/files/presign/route.ts`, `complete/route.ts`
+- [x] **T010** — S3 업로드 예약·확정과 파일 정책 구현 (T002, T003, T004 완료 후) `[P]`
+  - 구현 파일: `src/lib/file-policy.ts`, `src/modules/file/schema.ts`, `repository.ts`, `service.ts`, `src/app/api/files/presign/route.ts`, `complete/route.ts`
   - 관련 요구사항: `FR-009`, `NFR-001`~`NFR-004`
-  - 상세: MIME/확장자/크기 검증, UUID key, 5분 PUT, S3 확인, uploadId idempotency를 구현한다.
-  - 완료 기준: 허용·금지·경계·중복·교차 tenant 테스트가 통과한다.
+  - 상세: MIME/확장자/크기 검증, S3 key 예약, 5분 PUT, S3 확인, uploadId idempotency를 구현한다.
+  - 완료 기준: 허용·금지·경계 단위 테스트가 통과한다. 중복·교차 tenant 통합 테스트(DB·S3 mock)는 테스트 인프라가 세워지는 T016에서 작성한다.
 
 - [ ] **T011** — 공유 링크와 다운로드 계약 구현 (T010 완료 후)
   - 구현 파일: `src/modules/file/repository.ts`, `service.ts`, `src/app/share/[token]/page.tsx`, `src/app/api/files/download/route.ts`

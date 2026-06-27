@@ -154,3 +154,34 @@
 
 - Zod v4에서 `error.errors` → `error.issues`로 변경됨. 다른 Server Action 작성 시 동일하게 적용한다.
 - Server Action 오류 전달을 `redirect + searchParams` 방식으로 구현했다. React 19의 `useActionState`로 교체하면 클라이언트 상태를 더 세밀하게 제어할 수 있으나 T007 범위 외다.
+
+---
+
+## [001-b2b-agency-mvp] T010 완료
+
+**변경 파일**:
+
+- `src/lib/file-policy.ts` (신규): 파일 정책(허용 MIME·차단 확장자·최대 크기)·`validateFilePolicy`·`buildS3Key`를 server-only 의존 없는 순수 모듈로 분리. 단위 테스트 가능
+- `src/lib/s3.ts`: 인라인 `FILE_POLICY` 정의를 제거하고 `file-policy.ts`에서 re-export (단일 소스 유지)
+- `src/modules/file/schema.ts` (신규): presign/complete 입력 Zod 스키마. `uploadId`는 멱등 토큰으로 검증
+- `src/modules/file/repository.ts` (신규): `FileUpload`·`FileItem` 데이터 접근, `confirmUpload` transaction
+- `src/modules/file/service.ts` (신규): 고객사 tenant 검증 → 정책 검증 → S3 key 예약 → presigned PUT(5분) 발급 / complete 시 S3 HeadObject 확인 후 FileItem 확정. uploadId·FileItem 멱등성과 P2002 동시성 처리
+- `src/app/api/files/presign/route.ts` (신규): POST presign. 401/400/404/409 분기
+- `src/app/api/files/complete/route.ts` (신규): POST complete. 401/400/404/422 분기
+- `src/modules/tenant/access.ts`: Route Handler용 비-redirect `getTenantAccess()` 추가 (미인증 시 null 반환 → API 401 JSON)
+- `src/lib/file-policy.test.ts` (신규): 정책·확장자·S3 key 단위 테스트 11건
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과
+- `pnpm lint`: 통과
+- `pnpm test`: 2 files, 12 tests 통과 (신규 11 + 기존 1)
+- `pnpm build`: production build 통과 (`/api/files/presign`, `/api/files/complete` dynamic 라우트 생성)
+
+**후속 작업 시 주의사항**:
+
+- **통합 테스트 위임**: 중복(uploadId/FileItem 멱등)·교차 tenant 거부·S3 확인 흐름의 통합 테스트는 본 차수에 미포함. vitest에 `server-only` alias와 PostgreSQL test DB·S3 mock 인프라가 필요하며 이는 T016 범위다. 현재 단위 테스트는 순수 정책 모듈(`file-policy.ts`)만 커버한다.
+- **uploadId 형식**: `crypto.randomUUID()`가 비-secure context(HTTP+비localhost)에서 실패하므로(typescript 규칙), 백엔드는 엄격한 RFC UUID 대신 `^[A-Za-z0-9_-]{16,64}$` 토큰으로 검증한다. T012 UI에서 uploadId 생성 시 이 제약을 따른다.
+- **파일 정책 위치 이동**: `FILE_POLICY`가 `s3.ts` → `file-policy.ts`로 이동했다. 정책 참조는 `@/lib/file-policy` 또는 `@/lib/s3`(re-export) 어느 쪽도 가능하나, 검증 로직 추가는 순수 모듈인 `file-policy.ts`에 둔다.
+- **complete 응답 422**: S3 객체 미존재·크기 불일치는 422로 응답하고 `FileUpload.status`를 FAILED로 전이한다. T012에서 재시도 UX를 설계할 때 이 상태를 참조한다.
+- T011(공유 링크·다운로드)은 본 차수의 `FileItem`을 입력으로 사용한다.
