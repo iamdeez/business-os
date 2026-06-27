@@ -89,11 +89,11 @@
   - 상세: 고객사 파일 업로드(presign→S3 PUT→complete), 진행 상태, 파일 선택과 공유 링크 생성·폐기 UI를 만든다.
   - 완료 기준: UI 구현·빌드 완료. 업로드~다운로드 브라우저 E2E는 T017, 실제 S3 CORS·연동 검증은 T019에서 수행한다.
 
-- [ ] **T013** — 이메일 알림과 발송 로그 구현 (T002, T003, T008, T011 완료 후) `[P]`
-  - 구현 파일: `src/modules/notification/repository.ts`, `service.ts`, `templates.tsx`
+- [x] **T013** — 이메일 알림과 발송 로그 구현 (T002, T003, T008, T011 완료 후) `[P]`
+  - 구현 파일: `src/modules/notification/templates.tsx`, `repository.ts`, `service.ts`; 트리거: `inquiry/actions.ts`, `file/actions.ts`
   - 관련 요구사항: `FR-012`, `NFR-002`, `NFR-004`
-  - 상세: 두 템플릿, PENDING/SENT/FAILED, provider ID와 이중 idempotency를 구현한다.
-  - 완료 기준: provider 성공·실패·중복 mock 통합 테스트가 통과한다.
+  - 상세: 두 템플릿(`inquiry_received`·`files_shared`), PENDING/SENT/FAILED, provider ID와 이중 idempotency(DB unique + Resend header)를 구현한다.
+  - 완료 기준: 템플릿 단위 테스트가 통과한다. provider 성공·실패·중복 mock 통합 테스트는 T016에서 작성한다.
 
 - [ ] **T014** — 대시보드 query와 화면 구현 (T005, T006, T008, T010 완료 후) `[P]`
   - 구현 파일: `src/modules/dashboard/queries.ts`, `src/app/(admin)/dashboard/page.tsx`
