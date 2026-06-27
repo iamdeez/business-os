@@ -35,7 +35,7 @@
 
 ### In Progress
 
-- [ ] `PM-002` GitHub 저장소와 협업 규칙 구성
+- 없음
 
 ### Ready
 
@@ -60,6 +60,7 @@
 ### Done
 
 - [x] `PM-001` 프로젝트 관리 문서와 템플릿 초기화
+- [x] `PM-002` GitHub 저장소와 협업 규칙 구성 ([PR #1](https://github.com/iamdeez/business-os/pull/1))
 
 ## 결정 로그
 
