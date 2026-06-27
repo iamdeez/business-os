@@ -335,3 +335,33 @@
 - **실제 DB 통합·CI**: `SC-XXX`의 "PostgreSQL test DB 통과"는 T018(CI에 PostgreSQL service + 마이그레이션)과 T019(staging) 에서 연결한다. test DATABASE_URL 환경이 필요하다.
 - **mock 패턴**: service 테스트는 `vi.mock("./repository")` + `@aws-sdk/s3-request-presigner`·`@/lib/s3`·`@/lib/resend` mock 으로 외부 의존을 격리한다. 신규 service 로직 추가 시 동일 패턴 사용.
 - `server-only` alias 로 이제 모든 server 모듈을 테스트에서 import 할 수 있다.
+
+---
+
+## [001-b2b-agency-mvp] T017 (작성 차수) 완료
+
+**변경 파일**:
+
+- `playwright.config.ts` (신규): chromium, `webServer`(`pnpm start`), `baseURL`, `testDir: e2e/`, CI retry/reporter
+- `e2e/helpers.ts` (신규): 데모 OWNER 로그인 헬퍼, 데모 상수
+- `e2e/auth.spec.ts` (신규): 로그인 성공/실패/미인증 redirect (SC-001)
+- `e2e/inquiry.spec.ts` (신규): 공개 문의 접수 → 인박스 노출, 미존재 slug 거부 (SC-003)
+- `e2e/customer.spec.ts` (신규): 고객 생성·검색, 필수값 누락 (SC-005)
+- `e2e/responsive.spec.ts` (신규): 390px 대시보드·고객 가로 overflow 없음 (SC-012)
+- `e2e/file-share.spec.ts` (신규): 업로드~공유 — `E2E_S3_READY` 가드(staging 전용)
+- `package.json`: `@playwright/test` devDependency + `test:e2e` 스크립트
+- `.gitignore`: playwright 산출물 제외
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과 (e2e 포함)
+- `pnpm lint`: 통과
+- `pnpm test`: 6 files, 53 통과 (vitest 는 `src/**` 만, e2e 미포함)
+- **Chromium 실제 실행은 미수행** — 브라우저 + 실행 앱 + PostgreSQL 필요. T018 CI 에서 검증.
+
+**후속 작업 시 주의사항**:
+
+- **실행 검증 = T018 CI**: 본 차수는 E2E 스펙·config 작성까지다. 실제 Chromium 실행·통과 검증은 T018 CI(PostgreSQL service + 마이그레이션/seed + `playwright install` + `pnpm test:e2e`)에서 이뤄진다. CI 미구성 상태에서 main 의 E2E 는 자동 실행되지 않는다.
+- **file-share E2E**: 브라우저 직접 S3 PUT 은 실제 S3 + CORS 필요로 `test.skip(!E2E_S3_READY)` 가드. staging(T019)에서 `E2E_S3_READY=1` 로 실행.
+- **seed 의존**: 인증·인박스 E2E 는 데모 seed(`owner@demo-agency.com`, slug `demo-agency`)에 의존한다. CI 는 E2E 전에 `db:seed` 를 실행해야 한다.
+- **테스트 위치**: E2E 는 `e2e/*.spec.ts`(Playwright), 단위·service 는 `src/**/*.test.ts`(vitest). 분리 유지.
