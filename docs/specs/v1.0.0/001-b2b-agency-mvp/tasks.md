@@ -39,7 +39,7 @@
   - 상세: 이메일·비밀번호, 공개 가입 차단, 세션, OWNER seed와 server-side membership 검증을 구현한다.
   - 완료 기준: 인증·로그아웃과 교차 tenant 거부 통합 테스트가 통과한다.
 
-- [ ] **T005** — 공통 UI와 운영 레이아웃 구현 (T001, T004 완료 후) `[P]`
+- [x] **T005** — 공통 UI와 운영 레이아웃 구현 (T001, T004 완료 후) `[P]`
   - 구현 파일: `components.json`, `src/components/ui/*`, `src/components/layout/*`, `src/app/(auth)/login/page.tsx`, `src/app/(admin)/layout.tsx`, `src/app/globals.css`
   - 관련 요구사항: `FR-003`, `NFR-005`, `NFR-006`
   - 상세: 로그인, sidebar, header, 모바일 navigation과 공통 폼·테이블·상태 UI를 만든다.

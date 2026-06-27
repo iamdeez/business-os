@@ -101,3 +101,34 @@
 
 - `Account` 모델에 `@@unique([providerId, accountId])` 제약이 없다. Better Auth 런타임이 중복 insert를 시도할 경우 충돌 없이 복수 레코드가 생길 수 있다. T005 이후 로그인 플로우 검증 시 스키마에 `@@unique([providerId, accountId])`를 추가하는 것을 검토한다.
 - `src/modules/tenant/access.ts`의 `requireTenantAccess`는 `membership.findFirst`로 첫 번째 소속 tenant를 반환한다. 향후 멀티 tenant 지원 시 tenant 선택 로직이 필요하다.
+
+---
+
+## [001-b2b-agency-mvp] T005 완료
+
+**변경 파일**:
+
+- `src/app/globals.css`: Business OS 디자인 토큰 적용 (Plus Jakarta Sans, Indigo→Purple 팔레트, `--surface`, `--primary` 등 CSS 변수). Tailwind v4 `@theme inline` 블록으로 유틸리티 클래스 등록
+- `src/lib/utils.ts`: `cn()` — clsx + tailwind-merge 헬퍼
+- `src/components/ui/button.tsx`: 그라데이션 primary / outline / ghost / destructive 변형. 44px 기본 높이
+- `src/components/ui/input.tsx`: focus ring + border 전환. 44px 높이
+- `src/components/ui/label.tsx`: Radix Label 래퍼
+- `src/components/ui/badge.tsx`: default·active·inactive·warning·error·count 변형
+- `src/components/layout/sidebar.tsx`: 240px 고정 사이드바. 6개 nav + 설정. 활성 항목 보라색 배경
+- `src/components/layout/header.tsx`: 56px 헤더. 유저 아바타·이름·알림·로그아웃
+- `src/components/layout/mobile-nav.tsx`: 모바일 하단 5탭 네비게이션
+- `src/app/(auth)/login/page.tsx`: 좌측 브랜드(그라데이션) + 우측 이메일/패스워드 폼. signIn.email 연동
+- `src/app/(admin)/layout.tsx`: `requireTenantAccess` 서버 가드 + Sidebar + Header + MobileNav 조합
+- `src/app/(admin)/dashboard/page.tsx`: 빈 대시보드 shell (T014에서 완성)
+- `src/app/page.tsx`: `/dashboard` redirect로 교체
+- `src/app/page.test.tsx`: redirect 동작 반영으로 smoke test 갱신
+- `package.json`, `pnpm-lock.yaml`: `clsx`, `tailwind-merge`, `class-variance-authority`, `lucide-react`, `@radix-ui/react-slot`, `@radix-ui/react-label` 추가
+
+**검증 결과**:
+
+- `tsc --noEmit`: 통과
+
+**후속 작업 시 주의사항**:
+
+- `globals.css`의 Google Fonts `@import`는 개발 환경에서 네트워크 요청을 유발한다. 프로덕션에서는 `next/font/google`으로 교체하거나 self-hosted 방식을 고려한다.
+- `Header`의 로그아웃은 `signOut()` 후 `router.push("/login")`으로 처리한다. Better Auth 세션 쿠키 만료와 Next.js 라우터 사이의 타이밍 이슈가 발생하면 `window.location.href` 방식으로 교체한다.
