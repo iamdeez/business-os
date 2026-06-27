@@ -13,9 +13,9 @@
 ## 현재 단계
 
 - **단계**: Implementation / B2B 에이전시 MVP
-- **상태**: Ready
-- **현재 초점**: `OPS-002` GitHub 알림을 시작으로 Slack 워크플로우 순차 적용
-- **다음 마일스톤**: M1 Core 기반 구현 시작
+- **상태**: In Progress
+- **현재 초점**: `DEV-002` T004 — Better Auth + tenant membership 경계 구현
+- **다음 마일스톤**: M1 Core 기반 구현 완료 (인증·tenant·관리자 레이아웃)
 
 ## 성공 기준
 
@@ -38,12 +38,11 @@
 
 ### In Progress
 
-- 없음
+- [ ] `DEV-002` 환경·데이터·tenant 인증 기반 구현 (`T002~T004`)
 
 ### Ready
 
-- [ ] `OPS-002` GitHub PR·workflow·배포 Slack 알림 연동
-- [ ] `DEV-002` 환경·데이터·tenant 인증 기반 구현 (`T002~T004`)
+- (없음)
 
 ### Backlog
 
@@ -69,6 +68,7 @@
 - [x] `PM-002` GitHub 저장소와 협업 규칙 구성 ([PR #1](https://github.com/iamdeez/business-os/pull/1))
 - [x] `SPEC-001` B2B 에이전시 MVP 설계 ([문서](../docs/specs/v1.0.0/001-b2b-agency-mvp/spec.md))
 - [x] `DEV-001` Next.js 프로젝트 및 개발 도구 초기화 (`T001`)
+- [x] `OPS-002` GitHub PR·workflow·배포 Slack 알림 연동
 
 ## 결정 로그
 
@@ -82,6 +82,8 @@
 | DEC-006 | 2026-06-28 | 2주 MVP는 문의·CRM·파일·이메일·대시보드로 제한 | `SPEC-001` |
 | DEC-007 | 2026-06-28 | 애플리케이션 기준 런타임을 Node.js 24·pnpm 11·Next.js 16.2로 고정 | `DEV-001` |
 | DEC-008 | 2026-06-28 | Slack 워크플로우를 GitHub 알림 → 결정 요청 → 블로커 신고 → 주간 리뷰 → 채널 탭 순서로 적용 | `OPS-002~OPS-006` |
+| DEC-009 | 2026-06-28 | PostgreSQL 서비스는 Supabase 사용. CLI는 DIRECT_URL(port 5432), 앱 런타임은 DATABASE_URL(pgbouncer port 6543) | `DEV-002` |
+| DEC-010 | 2026-06-28 | Prisma 7 런타임 PrismaClient는 `@prisma/adapter-pg` driver adapter 필수 (`datasourceUrl` 생성자 옵션 제거됨) | `DEV-002` |
 
 ## 리스크와 확인 필요 사항
 

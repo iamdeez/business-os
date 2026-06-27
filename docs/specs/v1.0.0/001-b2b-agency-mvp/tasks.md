@@ -21,13 +21,13 @@
   - 상세: Next.js 16.2 안정 계열, TypeScript, Tailwind, App Router, pnpm과 lint/typecheck/test/build 스크립트를 구성한다.
   - 완료 기준: 기본 앱이 실행되고 lint·typecheck·build가 성공한다.
 
-- [ ] **T002** — 환경 계약과 외부 클라이언트 골격 작성 (T001 완료 후) `[P]`
+- [x] **T002** — 환경 계약과 외부 클라이언트 골격 작성 (T001 완료 후) `[P]`
   - 구현 파일: `.env.example`, `src/lib/env.ts`, `src/lib/s3.ts`, `src/lib/resend.ts`
   - 관련 요구사항: `NFR-002`, `NFR-003`, `NFR-004`
   - 상세: 환경변수를 서버 시작 시 검증하고 실제 값 없는 예제와 test adapter 주입 경계를 만든다.
   - 완료 기준: 필수 환경 누락은 명확한 서버 오류를 내고 클라이언트 bundle에 server secret이 포함되지 않는다.
 
-- [ ] **T003** — Prisma schema·최초 migration·seed 기반 작성 (T001 완료 후)
+- [x] **T003** — Prisma schema·최초 migration·seed 기반 작성 (T001 완료 후)
   - 구현 파일: `prisma/schema.prisma`, `prisma/migrations/*/migration.sql`, `prisma/seed.ts`, `src/lib/db.ts`
   - 관련 요구사항: `FR-004`~`FR-014`, `NFR-001`, `NFR-007`
   - 상세: plan의 데이터 모델, unique 제약과 tenant 복합 인덱스를 구현한다.

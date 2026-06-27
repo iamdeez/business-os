@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Tenant ──────────────────────────────────────────────────────────────────
+
+model Tenant {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships       Membership[]
+  customers         Customer[]
+  inquiries         Inquiry[]
+  fileUploads       FileUpload[]
+  fileItems         FileItem[]
+  shareLinks        ShareLink[]
+  notificationLogs  NotificationLog[]
+}
+
+// ─── Better Auth tables ───────────────────────────────────────────────────────
+// Better Auth manages these via its Prisma adapter.
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+
+  sessions    Session[]
+  accounts    Account[]
+  memberships Membership[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}
+
+// ─── Membership ───────────────────────────────────────────────────────────────
+
+enum MembershipRole {
+  OWNER
+  MEMBER
+}
+
+model Membership {
+  id       String         @id @default(cuid())
+  tenantId String
+  userId   String
+  role     MembershipRole @default(MEMBER)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId])
+}
+
+// ─── Customer ─────────────────────────────────────────────────────────────────
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Customer {
+  id          String         @id @default(cuid())
+  tenantId    String
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  memo        String?
+  status      CustomerStatus @default(ACTIVE)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  tenant    Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inquiries Inquiry[]
+  fileItems FileItem[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+}
+
+// ─── Inquiry ──────────────────────────────────────────────────────────────────
+
+enum InquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
+
+model Inquiry {
+  id          String        @id @default(cuid())
+  tenantId    String
+  customerId  String?
+  requestId   String
+  // 접수 시점 snapshot
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  message     String
+  consentedAt DateTime
+  status      InquiryStatus @default(NEW)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@unique([tenantId, requestId])
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+}
+
+// ─── File ─────────────────────────────────────────────────────────────────────
+
+enum FileUploadStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model FileUpload {
+  id          String           @id @default(cuid())
+  uploadId    String           @unique
+  tenantId    String
+  customerId  String
+  s3Key       String
+  displayName String
+  mimeType    String
+  size        Int
+  status      FileUploadStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  fileItem FileItem?
+
+  @@index([tenantId])
+}
+
+model FileItem {
+  id          String   @id @default(cuid())
+  tenantId    String
+  customerId  String
+  uploadId    String   @unique
+  displayName String
+  s3Key       String
+  size        Int
+  mimeType    String
+  createdAt   DateTime @default(now())
+
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer        Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  fileUpload      FileUpload      @relation(fields: [uploadId], references: [uploadId])
+  shareLinkFiles  ShareLinkFile[]
+
+  @@index([tenantId])
+  @@index([tenantId, customerId])
+}
+
+// ─── Share Link ───────────────────────────────────────────────────────────────
+
+model ShareLink {
+  id         String    @id @default(cuid())
+  tenantId   String
+  customerId String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  tenant Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  files  ShareLinkFile[]
+
+  @@index([tenantId])
+}
+
+model ShareLinkFile {
+  shareLinkId String
+  fileItemId  String
+
+  shareLink ShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+  fileItem  FileItem  @relation(fields: [fileItemId], references: [id], onDelete: Cascade)
+
+  @@id([shareLinkId, fileItemId])
+}
+
+// ─── Notification ─────────────────────────────────────────────────────────────
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model NotificationLog {
+  id                String             @id @default(cuid())
+  tenantId          String
+  type              String
+  recipient         String
+  templateKey       String
+  status            NotificationStatus @default(PENDING)
+  providerMessageId String?
+  idempotencyKey    String
+  errorCode         String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, idempotencyKey])
+  @@index([tenantId])
+}
