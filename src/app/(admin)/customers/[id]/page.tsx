@@ -4,23 +4,65 @@ import { ChevronLeft, CheckCircle2 } from "lucide-react";
 import { requireTenantAccess } from "@/modules/tenant/access";
 import { getCustomer } from "@/modules/crm/repository";
 import { updateCustomerAction } from "@/modules/crm/actions";
+import { listFileItems, listShareLinks } from "@/modules/file/repository";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { FileManager, type FileRow, type ShareRow } from "./file-manager";
+
+// "now" 의존 매핑은 컴포넌트 밖(비-렌더)에서 수행한다 (react-hooks/purity).
+function toFileRows(
+  items: Awaited<ReturnType<typeof listFileItems>>
+): FileRow[] {
+  return items.map((f) => ({
+    id: f.id,
+    displayName: f.displayName,
+    size: f.size,
+    createdAt: f.createdAt.toLocaleDateString("ko-KR"),
+  }));
+}
+
+function toShareRows(
+  links: Awaited<ReturnType<typeof listShareLinks>>
+): ShareRow[] {
+  const now = Date.now();
+  return links.map((s) => ({
+    id: s.id,
+    expiresAt: s.expiresAt.toLocaleString("ko-KR"),
+    revokedAt: s.revokedAt ? s.revokedAt.toISOString() : null,
+    createdAt: s.createdAt.toLocaleDateString("ko-KR"),
+    fileCount: s.files.length,
+    expired: s.expiresAt.getTime() <= now,
+  }));
+}
 
 interface Props {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ error?: string; updated?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    updated?: string;
+    share?: string;
+    revoked?: string;
+    fileError?: string;
+  }>;
 }
 
 export default async function CustomerDetailPage({ params, searchParams }: Props) {
   const { tenantId } = await requireTenantAccess();
   const { id } = await params;
-  const { error, updated } = await searchParams;
+  const { error, updated, share, revoked, fileError } = await searchParams;
 
   const customer = await getCustomer(tenantId, id);
   if (!customer) notFound();
+
+  const [fileItems, shareLinks] = await Promise.all([
+    listFileItems(tenantId, id),
+    listShareLinks(tenantId, id),
+  ]);
+
+  const files = toFileRows(fileItems);
+  const shares = toShareRows(shareLinks);
 
   const updateAction = updateCustomerAction.bind(null, id);
 
@@ -150,6 +192,21 @@ export default async function CustomerDetailPage({ params, searchParams }: Props
           </div>
         </form>
       </div>
+
+      {revoked && (
+        <div className="mt-4 flex items-center gap-2 rounded-lg bg-[#dcfce7] px-4 py-3 text-sm text-[#15803d]">
+          <CheckCircle2 className="h-4 w-4" />
+          공유 링크를 폐기했습니다.
+        </div>
+      )}
+
+      <FileManager
+        customerId={id}
+        files={files}
+        shares={shares}
+        shareToken={share}
+        fileError={fileError}
+      />
     </div>
   );
 }

@@ -212,3 +212,30 @@
 - **공유 링크 생성·폐기 UI(운영자)** 는 T012 범위다. T011은 백엔드 계약(`createShare`/`revokeShare`/`resolveShare`/`getDownloadUrl`) + 공개 다운로드 화면까지다.
 - **다운로드는 302 redirect**: `/api/files/download`는 presigned S3 URL 로 redirect 하므로 토큰이 query string 에 노출된다. MVP 공유 링크 수준에서 허용하며, 추가 보안이 필요하면 POST 본문 방식으로 전환한다.
 - **기본 만료값**: 공유 링크 7일(`SHARE_LINK_TTL_DAYS`), 다운로드 URL 15분(`DOWNLOAD_URL_TTL`). T012 에서 만료 기간 선택 UI 추가 시 이 상수를 파라미터화한다.
+
+---
+
+## [001-b2b-agency-mvp] T012 완료
+
+**변경 파일**:
+
+- `src/modules/file/upload-token.ts` (신규): 클라이언트 uploadId 생성. `crypto.randomUUID()` 미사용(비-secure context 대응), 백엔드 정규식 충족
+- `src/modules/file/actions.ts` (신규): `createShareAction`(선택 파일 → 공유 token 1회 표시), `revokeShareAction` 서버 액션
+- `src/app/(admin)/customers/[id]/file-manager.tsx` (신규, 클라이언트): 파일 업로드(presign→S3 PUT→complete) + 진행 상태, 파일 선택·공유 링크 생성, 생성된 URL 복사, 공유 링크 목록·폐기
+- `src/app/(admin)/customers/[id]/page.tsx`: `listFileItems`·`listShareLinks` 조회 후 `FileManager` 렌더. "now" 의존 매핑은 컴포넌트 밖 헬퍼로 분리(react-hooks/purity)
+- `src/app/(admin)/files/page.tsx` (신규): tenant 전체 파일 목록 + 고객 연결
+- `src/modules/file/repository.ts`: `listTenantFiles`(고객 정보 포함) 추가
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과
+- `pnpm lint`: 통과
+- `pnpm test`: 3 files, 17 tests 통과
+- `pnpm build`: production build 통과 (`/files`, `/customers/[id]` 갱신)
+
+**후속 작업 시 주의사항**:
+
+- **S3 CORS 필요**: 브라우저가 presigned PUT 으로 S3 에 직접 업로드하므로 S3 버킷에 운영 도메인 출처의 PUT CORS 설정이 필요하다. 미설정 시 업로드가 CORS 오류로 실패한다 (T019 staging 검증 항목).
+- **react-hooks/purity**: 서버 컴포넌트 렌더 본문에서 `Date.now()`/`Math.random()` 직접 호출은 lint 에러다. "현재 시각" 의존 로직은 컴포넌트 밖 모듈 함수로 분리한다.
+- **공유 token 1회 노출**: `createShareAction` 은 token 을 `?share=` 로 전달해 화면에 1회 표시한다. 새로고침·재방문 시 재노출되지 않는다(재생성 필요).
+- E2E(업로드~다운로드)는 T017, 실제 S3·Resend staging 검증은 T019 범위다. DEV-005 백엔드·UI 구현은 본 차수로 완료.

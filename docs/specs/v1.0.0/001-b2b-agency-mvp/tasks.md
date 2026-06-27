@@ -83,11 +83,11 @@
   - 상세: 선택 파일 transaction 검증, token hash, 만료·폐기, 15분 GET URL을 구현한다.
   - 완료 기준: 토큰 해시 단위 테스트가 통과한다. 유효·만료·폐기·tenant 불일치 통합 테스트(DB·S3 mock)는 T016에서 작성한다.
 
-- [ ] **T012** — 파일 관리·공유 UI 구현 (T005, T007, T010, T011 완료 후)
-  - 구현 파일: `src/app/(admin)/files/page.tsx`, `src/app/(admin)/customers/[id]/page.tsx`
+- [x] **T012** — 파일 관리·공유 UI 구현 (T005, T007, T010, T011 완료 후)
+  - 구현 파일: `src/app/(admin)/files/page.tsx`, `src/app/(admin)/customers/[id]/page.tsx`, `customers/[id]/file-manager.tsx`, `src/modules/file/actions.ts`, `upload-token.ts`
   - 관련 요구사항: `FR-009`~`FR-011`, `NFR-005`, `NFR-006`
-  - 상세: 고객사 파일 업로드, 진행 상태, 파일 선택과 공유 링크 생성·폐기 UI를 만든다.
-  - 완료 기준: 업로드부터 고객 다운로드까지 E2E가 통과한다.
+  - 상세: 고객사 파일 업로드(presign→S3 PUT→complete), 진행 상태, 파일 선택과 공유 링크 생성·폐기 UI를 만든다.
+  - 완료 기준: UI 구현·빌드 완료. 업로드~다운로드 브라우저 E2E는 T017, 실제 S3 CORS·연동 검증은 T019에서 수행한다.
 
 - [ ] **T013** — 이메일 알림과 발송 로그 구현 (T002, T003, T008, T011 완료 후) `[P]`
   - 구현 파일: `src/modules/notification/repository.ts`, `service.ts`, `templates.tsx`
