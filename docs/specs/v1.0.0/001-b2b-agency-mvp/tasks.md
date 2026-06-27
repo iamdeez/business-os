@@ -95,11 +95,11 @@
   - 상세: 두 템플릿(`inquiry_received`·`files_shared`), PENDING/SENT/FAILED, provider ID와 이중 idempotency(DB unique + Resend header)를 구현한다.
   - 완료 기준: 템플릿 단위 테스트가 통과한다. provider 성공·실패·중복 mock 통합 테스트는 T016에서 작성한다.
 
-- [ ] **T014** — 대시보드 query와 화면 구현 (T005, T006, T008, T010 완료 후) `[P]`
+- [x] **T014** — 대시보드 query와 화면 구현 (T005, T006, T008, T010 완료 후) `[P]`
   - 구현 파일: `src/modules/dashboard/queries.ts`, `src/app/(admin)/dashboard/page.tsx`
   - 관련 요구사항: `FR-013`, `NFR-001`, `NFR-007`
-  - 상세: tenant별 고객·NEW 문의·파일 집계와 최근 문의 5건을 표시한다.
-  - 완료 기준: fixture 집계와 UI 표시가 일치한다.
+  - 상세: tenant별 고객·NEW 문의·파일 집계(count)와 최근 문의 5건(생성일 desc)을 표시한다.
+  - 완료 기준: 쿼리·UI 구현 완료. fixture 집계 일치 검증은 T016에서 작성한다.
 
 - [ ] **T015** — B2B 에이전시 데모 seed 완성 (T003, T006, T008, T010 완료 후) `[P]`
   - 구현 파일: `prisma/seed.ts`

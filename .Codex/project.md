@@ -42,6 +42,7 @@
 - [ ] `DEV-003` 고객 CRM 구현 — 목록 상세 슬라이드인 모달 ([PR #5](https://github.com/iamdeez/business-os/pull/5))
 - [ ] `DEV-005` 파일 업로드·공유 구현 — T010 업로드·T011 공유·T012 UI 완료 (E2E·staging 검증 잔여: T017/T019)
 - [ ] `DEV-006` 이메일 알림과 발송 로그 구현 — T013 inquiry_received·files_shared 발송·로그·트리거 (통합 테스트 T016 잔여)
+- [ ] `DEV-007` 기본 대시보드 구현 — T014 집계 카드·최근 문의 5건 (fixture 검증 T016 잔여)
 
 ### Ready
 
@@ -50,7 +51,6 @@
 ### Backlog
 
 - [ ] `DEV-004` 공개 문의 접수와 관리자 인박스 구현
-- [ ] `DEV-007` 기본 대시보드 구현
 - [ ] `OPS-001` 개발·배포 환경과 관측성 정의
 - [ ] `OPS-003` Slack 결정·범위 변경 요청 워크플로우
 - [ ] `OPS-004` Slack 블로커 신고 워크플로우
