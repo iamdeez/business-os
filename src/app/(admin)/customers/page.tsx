@@ -1,11 +1,30 @@
 import Link from "next/link";
-import { Plus, Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  Plus,
+  Search,
+  SlidersHorizontal,
+  X,
+  Mail,
+  Phone,
+  Clock,
+  ExternalLink,
+  CheckCircle2,
+} from "lucide-react";
 import { requireTenantAccess } from "@/modules/tenant/access";
-import { listCustomers, getCustomerStats } from "@/modules/crm/repository";
+import { listCustomers, getCustomerStats, getCustomer } from "@/modules/crm/repository";
+import { updateCustomerAction } from "@/modules/crm/actions";
 import { Button } from "@/components/ui/button";
+import { ModalWrapper } from "./modal-wrapper";
 
 interface Props {
-  searchParams: Promise<{ page?: string; search?: string; status?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+    status?: string;
+    selected?: string;
+    updated?: string;
+    error?: string;
+  }>;
 }
 
 export default async function CustomersPage({ searchParams }: Props) {
@@ -18,10 +37,12 @@ export default async function CustomersPage({ searchParams }: Props) {
     params.status === "ACTIVE" || params.status === "INACTIVE"
       ? params.status
       : undefined;
+  const selectedId = params.selected;
 
-  const [{ customers, total, totalPages }, stats] = await Promise.all([
+  const [{ customers, total, totalPages }, stats, selectedCustomer] = await Promise.all([
     listCustomers(tenantId, { page, search, status }),
     getCustomerStats(tenantId),
+    selectedId ? getCustomer(tenantId, selectedId) : Promise.resolve(null),
   ]);
 
   const activeFilters: { label: string; clearKey: string }[] = [];
@@ -39,17 +60,23 @@ export default async function CustomersPage({ searchParams }: Props) {
       page: String(page),
       search,
       status: params.status,
+      selected: params.selected,
       ...overrides,
     };
     if (Number(merged.page) > 1) p.set("page", merged.page!);
     if (merged.search) p.set("search", merged.search);
     if (merged.status) p.set("status", merged.status);
+    if (merged.selected) p.set("selected", merged.selected);
     const qs = p.toString();
     return `/customers${qs ? `?${qs}` : ""}`;
   }
 
+  const closeHref = buildHref({ selected: undefined, updated: undefined, error: undefined });
+  const modalReturnPath = selectedId ? buildHref({ updated: undefined, error: undefined }) : "";
+
   return (
-    <div className="flex flex-col gap-6">
+    <>
+      <div className="flex flex-col gap-6">
       {/* Row 1: Search & Actions */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <form method="get" className="relative w-full sm:w-80">
@@ -156,10 +183,14 @@ export default async function CustomersPage({ searchParams }: Props) {
                 </td>
               </tr>
             ) : (
-              customers.map((c) => (
+              customers.map((c) => {
+                const isSelected = c.id === selectedId;
+                return (
                 <tr
                   key={c.id}
-                  className="group cursor-pointer transition-colors hover:bg-[#4f378a]/5"
+                  className={`group cursor-pointer transition-colors ${
+                    isSelected ? "bg-[#4f378a]/5" : "hover:bg-[#4f378a]/5"
+                  }`}
                 >
                   <td className="px-5 py-4 font-semibold text-[#1d1b20]">
                     {c.companyName}
@@ -173,7 +204,7 @@ export default async function CustomersPage({ searchParams }: Props) {
                   </td>
                   <td className="px-5 py-4">
                     {c.status === "ACTIVE" ? (
-                      <span className="inline-flex ite ms-center rounded-full border border-green-200 bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
+                      <span className="inline-flex items-center rounded-full border border-green-200 bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
                         활성
                       </span>
                     ) : (
@@ -184,14 +215,20 @@ export default async function CustomersPage({ searchParams }: Props) {
                   </td>
                   <td className="px-5 py-4 text-center">
                     <Link
-                      href={`/customers/${c.id}`}
-                      className="rounded-lg border border-[#4f378a]/20 px-4 py-1.5 text-[11px] font-bold text-[#4f378a] transition-all group-hover:bg-[#4f378a] group-hover:text-white"
+                      href={buildHref({ selected: c.id })}
+                      scroll={false}
+                      className={`rounded-lg border px-4 py-1.5 text-[11px] font-bold transition-all ${
+                        isSelected
+                          ? "border-[#4f378a] bg-[#4f378a] text-white"
+                          : "border-[#4f378a]/20 text-[#4f378a] group-hover:bg-[#4f378a] group-hover:text-white"
+                      }`}
                     >
                       보기
                     </Link>
                   </td>
                 </tr>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>
@@ -227,6 +264,202 @@ export default async function CustomersPage({ searchParams }: Props) {
           </div>
         </div>
       )}
+      </div>
+
+      {/* Modal */}
+      {selectedCustomer && (
+        <ModalWrapper closeHref={closeHref}>
+          {/* Modal header */}
+          <div className="flex items-center justify-between border-b border-[#cbc4d2]/60 px-5 py-4">
+            <div className="flex items-center gap-2">
+              <span
+                className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
+                  selectedCustomer.status === "ACTIVE"
+                    ? "border-green-200 bg-green-50 text-green-700"
+                    : "border-[#cbc4d2] bg-[#e6e0e9] text-[#494551]"
+                }`}
+              >
+                {selectedCustomer.status === "ACTIVE" ? "활성" : "비활성"}
+              </span>
+              <span className="text-sm font-semibold text-[#1d1b20]">
+                {selectedCustomer.companyName}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Link
+                href={`/customers/${selectedCustomer.id}`}
+                title="전체 화면으로 보기"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#7a7582] hover:bg-[#f2ecf4] hover:text-[#1d1b20]"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Link>
+              <Link
+                href={closeHref}
+                scroll={false}
+                aria-label="닫기"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#7a7582] hover:bg-[#f2ecf4] hover:text-[#1d1b20]"
+              >
+                <X className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Toast */}
+          {params.updated && (
+            <div className="mx-5 mt-4 flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700">
+              <CheckCircle2 className="h-4 w-4" />
+              변경 사항이 저장되었습니다.
+            </div>
+          )}
+          {params.error && (
+            <div className="mx-5 mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+              {decodeURIComponent(params.error)}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-5 p-5">
+            {/* Contact info */}
+            <div className="rounded-xl border border-[#cbc4d2]/60 bg-[#f8f2fa] p-4">
+              <div className="grid gap-3">
+                <InfoRow
+                  icon={<Mail className="h-4 w-4" />}
+                  label="이메일"
+                  value={selectedCustomer.email}
+                />
+                {selectedCustomer.phone && (
+                  <InfoRow
+                    icon={<Phone className="h-4 w-4" />}
+                    label="연락처"
+                    value={selectedCustomer.phone}
+                  />
+                )}
+                <InfoRow
+                  icon={<Clock className="h-4 w-4" />}
+                  label="등록일시"
+                  value={selectedCustomer.createdAt.toLocaleString("ko-KR")}
+                />
+              </div>
+            </div>
+
+            {/* Edit form */}
+            <form
+              action={updateCustomerAction.bind(null, selectedCustomer.id)}
+              className="flex flex-col gap-4"
+            >
+              <input type="hidden" name="returnPath" value={modalReturnPath} />
+
+              <div className="grid grid-cols-2 gap-3">
+                <ModalField label="회사명" required>
+                  <input
+                    name="companyName"
+                    defaultValue={selectedCustomer.companyName}
+                    required
+                    className={MODAL_INPUT}
+                  />
+                </ModalField>
+                <ModalField label="담당자" required>
+                  <input
+                    name="contactName"
+                    defaultValue={selectedCustomer.contactName}
+                    required
+                    className={MODAL_INPUT}
+                  />
+                </ModalField>
+              </div>
+
+              <ModalField label="이메일" required>
+                <input
+                  name="email"
+                  type="email"
+                  defaultValue={selectedCustomer.email}
+                  required
+                  className={MODAL_INPUT}
+                />
+              </ModalField>
+
+              <div className="grid grid-cols-2 gap-3">
+                <ModalField label="연락처">
+                  <input
+                    name="phone"
+                    defaultValue={selectedCustomer.phone ?? ""}
+                    className={MODAL_INPUT}
+                  />
+                </ModalField>
+                <ModalField label="상태">
+                  <select
+                    name="status"
+                    defaultValue={selectedCustomer.status}
+                    className={MODAL_INPUT}
+                  >
+                    <option value="ACTIVE">활성</option>
+                    <option value="INACTIVE">비활성</option>
+                  </select>
+                </ModalField>
+              </div>
+
+              <ModalField label="메모">
+                <textarea
+                  name="memo"
+                  rows={3}
+                  defaultValue={selectedCustomer.memo ?? ""}
+                  className={`${MODAL_INPUT} resize-none`}
+                />
+              </ModalField>
+
+              <div className="flex justify-end gap-2 border-t border-[#cbc4d2]/60 pt-4">
+                <Link
+                  href={closeHref}
+                  scroll={false}
+                  className="rounded-lg border border-[#cbc4d2] px-4 py-2 text-sm font-medium text-[#494551] hover:bg-[#f2ecf4]"
+                >
+                  닫기
+                </Link>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-[#4f378a] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3b2571]"
+                >
+                  저장
+                </button>
+              </div>
+            </form>
+          </div>
+        </ModalWrapper>
+      )}
+    </>
+  );
+}
+
+const MODAL_INPUT =
+  "w-full rounded-lg border border-[#cbc4d2] bg-white px-3 py-2 text-sm text-[#1d1b20] outline-none transition-colors focus:border-[#4f378a] focus:ring-2 focus:ring-[#4f378a]/10";
+
+function ModalField({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-semibold text-[#7a7582]">
+        {label}
+        {required && <span className="ml-0.5 text-red-500">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-2">
+      <span className="mt-0.5 text-[#7a7582]">{icon}</span>
+      <div>
+        <p className="text-[11px] text-[#7a7582]">{label}</p>
+        <p className="text-sm text-[#1d1b20]">{value}</p>
+      </div>
     </div>
   );
 }
