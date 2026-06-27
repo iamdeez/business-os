@@ -40,7 +40,7 @@
 
 - [ ] `DEV-002` 환경·데이터·tenant 인증 기반 구현 (`T002~T004`)
 - [ ] `DEV-003` 고객 CRM 구현 — 목록 상세 슬라이드인 모달 ([PR #5](https://github.com/iamdeez/business-os/pull/5))
-- [ ] `DEV-005` 파일 업로드·공유 구현 — T010 업로드·T011 공유 링크/다운로드 (T012 파일 UI 잔여)
+- [ ] `DEV-005` 파일 업로드·공유 구현 — T010 업로드·T011 공유·T012 UI 완료 (E2E·staging 검증 잔여: T017/T019)
 
 ### Ready
 

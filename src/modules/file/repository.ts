@@ -68,6 +68,16 @@ export async function listFileItems(tenantId: string, customerId: string) {
   });
 }
 
+// tenant 전체 파일 목록 (고객사 정보 포함, 파일 관리 화면용).
+export async function listTenantFiles(tenantId: string) {
+  return db.fileItem.findMany({
+    where: { tenantId },
+    orderBy: { createdAt: "desc" },
+    include: { customer: { select: { id: true, companyName: true } } },
+    take: 100,
+  });
+}
+
 /**
  * 공유 링크 생성. transaction 안에서 fileItemId 전체를 tenant·customer 조건으로
  * 재조회하고 개수가 일치할 때만 연결한다 (교차 tenant·타 고객 파일 혼입 차단).
