@@ -365,3 +365,23 @@
 - **file-share E2E**: 브라우저 직접 S3 PUT 은 실제 S3 + CORS 필요로 `test.skip(!E2E_S3_READY)` 가드. staging(T019)에서 `E2E_S3_READY=1` 로 실행.
 - **seed 의존**: 인증·인박스 E2E 는 데모 seed(`owner@demo-agency.com`, slug `demo-agency`)에 의존한다. CI 는 E2E 전에 `db:seed` 를 실행해야 한다.
 - **테스트 위치**: E2E 는 `e2e/*.spec.ts`(Playwright), 단위·service 는 `src/**/*.test.ts`(vitest). 분리 유지.
+
+---
+
+## [001-b2b-agency-mvp] T018 완료
+
+**변경 파일**:
+
+- `.github/workflows/app-ci.yml` (신규): PR/Push(main) 트리거. `postgres:16` service + 더미 외부 env. pnpm 11.7/Node 24 → `install --frozen-lockfile` → `db:generate` → `db:push` → `db:seed` → `lint` → `typecheck` → `test`(vitest) → `build` → `playwright install chromium` → `test:e2e`
+
+**검증 결과**:
+
+- `pnpm lint`: 통과
+- (CI job 자체의 실제 통과는 본 PR 의 App CI run 으로 검증된다 — 이 워크플로가 PR 에서 실행됨)
+
+**후속 작업 시 주의사항**:
+
+- **마이그레이션 부재**: `prisma/migrations/` 가 없어 CI 는 `db:push` 로 스키마를 동기화한다. 향후 마이그레이션 도입 시 `prisma migrate deploy` 로 전환한다.
+- **이 PR 이 검증 환경**: app-ci.yml 이 본 PR 에서 실행되어 그동안 작성만 했던 T016 service 테스트·T017 E2E 가 실제 PostgreSQL·Chromium 으로 통과하는지 처음 검증된다. 실패 시 반복 수정한다.
+- **file-share E2E**: `E2E_S3_READY` 미설정으로 CI 에서 skip. 실제 S3 검증은 T019 staging.
+- **secret 미사용**: CI 외부 env 는 더미. 실제 staging 검증(T019)은 별도 secret 환경에서 수행.

@@ -53,7 +53,7 @@
 ### Backlog
 
 - [ ] `DEV-004` 공개 문의 접수와 관리자 인박스 구현
-- [ ] `OPS-001` 개발·배포 환경과 관측성 정의
+- [ ] `OPS-001` 개발·배포 환경과 관측성 정의 — T018 App CI(PostgreSQL service + db push/seed + lint/typecheck/test/build/E2E) 구성
 - [ ] `OPS-003` Slack 결정·범위 변경 요청 워크플로우
 - [ ] `OPS-004` Slack 블로커 신고 워크플로우
 - [ ] `OPS-005` Slack 주간 리뷰 예약 워크플로우
