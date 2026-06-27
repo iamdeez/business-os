@@ -311,3 +311,27 @@
 - **데모 공유 토큰 공개**: `DEMO_SHARE_TOKEN = "demo_share_techstart_0001"` → `/share/demo_share_techstart_0001` 로 공유 흐름을 시연할 수 있다. 운영 데이터에는 사용하지 않는다.
 - **idempotency**: 모든 신규 레코드는 고정 id + `update:{}` upsert 라 2회 실행 시 수·로그인 동일. 실제 2회 실행 동일 확인은 DB 연결 후 수행(T019).
 - **로그인**: `owner@demo-agency.com` / `demo1234!` (tenant `demo-agency`).
+
+---
+
+## [001-b2b-agency-mvp] T016 (mock 차수) 완료
+
+**변경 파일**:
+
+- `vitest.config.ts`: `server-only` → 빈 모듈 alias 추가 (service/repository 를 테스트에서 import 가능하게)
+- `src/test/empty-module.ts` (신규): server-only 스텁
+- `src/modules/file/service.test.ts` (신규): reserveUpload/completeUpload/createShare/resolveShare/getDownloadUrl 오케스트레이션 — repository·S3·crm·presigner mock 으로 멱등(P2002)·정책·교차 tenant 가드·만료/폐기·크기 불일치 분기 검증
+- `src/modules/notification/service.test.ts` (신규): 발송 성공/실패(provider error/throw)/중복(dedup)/NO_RECIPIENT/P2002 — repository·Resend mock
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과
+- `pnpm lint`: 통과
+- `pnpm test`: 6 files, 53 tests 통과 (순수 단위 24 + service mock 29)
+
+**후속 작업 시 주의사항**:
+
+- **mock 차수 한정**: 본 차수는 service 오케스트레이션 로직을 mock(Prisma·S3·Resend)으로 검증한다. 실제 PostgreSQL 통합(트랜잭션 내 tenant·customer 재조회, unique 제약 동작 등)과 Resend 실제 발송은 검증하지 않는다.
+- **실제 DB 통합·CI**: `SC-XXX`의 "PostgreSQL test DB 통과"는 T018(CI에 PostgreSQL service + 마이그레이션)과 T019(staging) 에서 연결한다. test DATABASE_URL 환경이 필요하다.
+- **mock 패턴**: service 테스트는 `vi.mock("./repository")` + `@aws-sdk/s3-request-presigner`·`@/lib/s3`·`@/lib/resend` mock 으로 외부 의존을 격리한다. 신규 service 로직 추가 시 동일 패턴 사용.
+- `server-only` alias 로 이제 모든 server 모듈을 테스트에서 import 할 수 있다.
