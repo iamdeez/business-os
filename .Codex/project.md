@@ -44,6 +44,7 @@
 - [ ] `DEV-006` 이메일 알림과 발송 로그 구현 — T013 inquiry_received·files_shared 발송·로그·트리거 (통합 테스트 T016 잔여)
 - [ ] `DEV-007` 기본 대시보드 구현 — T014 집계 카드·최근 문의 5건 (fixture 검증 T016 잔여)
 - [ ] `DEV-008` 테스트 인프라 — T016 mock 기반 service 테스트 53건·server-only alias (실제 DB 통합은 T018/T019)
+- [ ] `DEV-009` 브라우저 E2E — T017 Playwright 스펙(인증·문의·고객·반응형) 작성 (실행 검증은 T018 CI)
 
 ### Ready
 

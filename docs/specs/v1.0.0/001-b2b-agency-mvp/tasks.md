@@ -115,11 +115,11 @@
   - 상세: schema·정책·토큰 순수 단위 + service 오케스트레이션(멱등·정책·교차 tenant 가드·만료/폐기·발송 분기)을 mock 으로 자동 검증한다.
   - 완료 기준(mock 차수): vitest `server-only` alias 설정 + service mock 테스트 53건 통과. **실제 PostgreSQL test DB 통합 테스트와 CI service(PostgreSQL)는 T018/T019 에서 연결한다.**
 
-- [ ] **T017** — 핵심 브라우저 E2E 작성 (T007, T009, T012, T014, T015 완료 후)
-  - 테스트 파일: `tests/e2e/auth.spec.ts`, `inquiry.spec.ts`, `customer.spec.ts`, `file-share.spec.ts`, `responsive.spec.ts`, `playwright.config.ts`
+- [~] **T017** — 핵심 브라우저 E2E 작성 (T007, T009, T012, T014, T015 완료 후)
+  - 테스트 파일: `e2e/auth.spec.ts`, `inquiry.spec.ts`, `customer.spec.ts`, `file-share.spec.ts`, `responsive.spec.ts`, `e2e/helpers.ts`, `playwright.config.ts`
   - 검증 대상: `SC-001`, `SC-003`, `SC-005`, `SC-006`, `SC-007`, `SC-008`, `SC-009`, `SC-010`, `SC-012`
-  - 상세: 실제 사용자 흐름과 390px 모바일·키보드 탐색을 검증한다.
-  - 완료 기준: Chromium 기준 핵심 E2E가 격리된 데이터로 통과한다.
+  - 상세: 로그인·공개 문의→인박스·고객 CRUD·390px 반응형을 Chromium 으로 검증한다. file-share 는 실제 S3 필요로 `E2E_S3_READY` 가드(staging 전용).
+  - 완료 기준(작성 차수): 스펙·config 작성 + typecheck/lint 통과. **실제 Chromium 실행·통과는 T018 CI(PostgreSQL service + 브라우저)에서 검증한다.**
 
 - [ ] **T018** — 애플리케이션 CI 구성 (T016, T017 완료 후)
   - 구현 파일: `.github/workflows/app-ci.yml`

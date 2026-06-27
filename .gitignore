@@ -7,6 +7,12 @@ out/
 dist/
 coverage/
 
+# playwright e2e artifacts
+playwright-report/
+test-results/
+/blob-report/
+.playwright/
+
 # local environment and secrets
 .env
 .env.*
