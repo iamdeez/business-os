@@ -8,6 +8,8 @@
 - **Default branch**: `main`
 - **Workflow**: 작업 브랜치 → PR → 정책 검사 → 병합 → Slack 공유
 - **Rules**: `CONTRIBUTING.md`
+- **Merge settings**: squash only, delete head branch after merge
+- **Server-side main protection**: pending — private repository rulesets require GitHub Pro
 
 ## Slack
 
@@ -46,3 +48,8 @@ Codex 기준 세션 및 로컬 문서
 4. Slack은 알림과 빠른 의사결정 채널이며, 확정 결정은 GitHub 또는 로컬 문서에 남긴다.
 5. Codex 기준 세션은 세 시스템의 불일치를 발견하면 먼저 기준 기록을 갱신한다.
 
+## 보류 중인 연동
+
+- GitHub 서버 측 `main` 보호: GitHub Pro 전환 또는 저장소 공개 결정 필요
+- GitHub 앱 기반 Slack 자동 알림: Slack 워크스페이스 앱 설치·채널 구독 권한 필요
+- 위 두 기능이 준비되기 전에는 Codex 기준 세션이 PR·병합·CI 이벤트를 `#business_os`에 공유한다.

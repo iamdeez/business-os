@@ -92,6 +92,22 @@ PR 제목은 커밋과 같은 형식을 사용한다.
 - 모든 단계에서 대화 해결, 선형 히스토리, 강제 푸시 금지, 브랜치 삭제 금지를 유지한다.
 - 관리자도 긴급 상황 외에는 동일한 규칙을 따른다.
 
+### 현재 GitHub 적용 상태
+
+- 저장소는 비공개로 유지한다.
+- squash merge만 허용하고 병합 후 작업 브랜치를 자동 삭제한다.
+- PR 정책 검사는 `.github/workflows/pr-policy.yml`로 실행한다.
+- 개인 비공개 저장소의 서버 측 Ruleset은 현재 GitHub 요금제에서 사용할 수 없어 절차 규칙으로 운영한다.
+- GitHub Pro 전환 또는 저장소 공개를 결정하면 `main`에 PR 필수, 대화 해결, 선형 히스토리, 삭제·force push 금지를 서버에서 강제한다.
+
+### 현재 GitHub 적용 상태
+
+- 저장소는 비공개로 유지한다.
+- squash merge만 허용하고 병합 후 작업 브랜치를 자동 삭제한다.
+- PR 정책 검사는 `.github/workflows/pr-policy.yml`로 실행한다.
+- 개인 비공개 저장소의 서버 측 Ruleset은 현재 GitHub 요금제에서 사용할 수 없어 절차 규칙으로 운영한다.
+- GitHub Pro 전환 또는 저장소 공개를 결정하면 `main`에 PR 필수, 대화 해결, 선형 히스토리, 삭제·force push 금지를 서버에서 강제한다.
+
 ## 6. Slack·Codex 연동
 
 - PR 생성 시: 목적, 주요 변경, 검증 상태, PR 링크를 `#business_os`에 공유한다.
@@ -112,4 +128,3 @@ PR 제목은 커밋과 같은 형식을 사용한다.
 7. Squash merge
 8. Slack과 .Codex/project.md에 완료 상태 반영
 ```
-
