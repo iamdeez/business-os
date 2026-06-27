@@ -20,8 +20,8 @@ coverage/
 # logs and temporary files
 *.log
 *.tmp
+*.tsbuildinfo
 tmp/
 
 # AI scratch files
 **/_ai-workspace/
-
