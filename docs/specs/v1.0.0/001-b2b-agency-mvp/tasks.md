@@ -109,11 +109,11 @@
 
 ### Phase 3. 검증·배포 준비
 
-- [ ] **T016** — 단위·통합 테스트 스위트 작성 (각 도메인 태스크와 병행) `[P]`
-  - 테스트 파일: `tests/unit/*.test.ts`, `tests/integration/*.test.ts`, `vitest.config.ts`
+- [~] **T016** — 단위·통합 테스트 스위트 작성 (각 도메인 태스크와 병행) `[P]`
+  - 테스트 파일: `vitest.config.ts`, `src/test/empty-module.ts`, `src/**/*.test.ts` (file-policy·share-token·templates·file/service·notification/service)
   - 검증 대상: `SC-002`, `SC-004`, `SC-005`, `SC-006`, `SC-007`, `SC-008`, `SC-009`, `SC-010`, `SC-011`
-  - 상세: schema, 상태, tenant repository, idempotency, 파일 token과 집계를 자동 검증한다.
-  - 완료 기준: SC 매핑 테스트가 PostgreSQL test DB에서 모두 통과한다.
+  - 상세: schema·정책·토큰 순수 단위 + service 오케스트레이션(멱등·정책·교차 tenant 가드·만료/폐기·발송 분기)을 mock 으로 자동 검증한다.
+  - 완료 기준(mock 차수): vitest `server-only` alias 설정 + service mock 테스트 53건 통과. **실제 PostgreSQL test DB 통합 테스트와 CI service(PostgreSQL)는 T018/T019 에서 연결한다.**
 
 - [ ] **T017** — 핵심 브라우저 E2E 작성 (T007, T009, T012, T014, T015 완료 후)
   - 테스트 파일: `tests/e2e/auth.spec.ts`, `inquiry.spec.ts`, `customer.spec.ts`, `file-share.spec.ts`, `responsive.spec.ts`, `playwright.config.ts`
