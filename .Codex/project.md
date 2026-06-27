@@ -39,6 +39,7 @@
 ### In Progress
 
 - [ ] `DEV-002` 환경·데이터·tenant 인증 기반 구현 (`T002~T004`)
+- [ ] `DEV-003` 고객 CRM 구현 — 목록 상세 슬라이드인 모달 ([PR #5](https://github.com/iamdeez/business-os/pull/5))
 
 ### Ready
 
@@ -46,7 +47,6 @@
 
 ### Backlog
 
-- [ ] `DEV-003` 고객 CRM 구현
 - [ ] `DEV-004` 공개 문의 접수와 관리자 인박스 구현
 - [ ] `DEV-005` 파일 업로드·공유 구현
 - [ ] `DEV-006` 이메일 알림과 발송 로그 구현
