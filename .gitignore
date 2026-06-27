@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+dist/
+coverage/
+
+# local environment and secrets
+.env
+.env.*
+!.env.example
+
+# editor and OS
+.DS_Store
+.idea/
+.vscode/
+
+# logs and temporary files
+*.log
+*.tmp
+tmp/
+
+# AI scratch files
+**/_ai-workspace/
+
