@@ -289,3 +289,25 @@
 - **무제한 로드 금지**: 집계는 `count`, 최근 문의는 `take: 5` + `select` 로 제한한다(plan NFR). 위젯 추가 시 동일 원칙 유지.
 - **최근 문의 링크**: `/inquiries?selected={id}` 로 인박스 모달을 연다(T009 모달 패턴 재사용).
 - fixture 집계 일치 검증은 DB 필요로 T016 위임.
+
+---
+
+## [001-b2b-agency-mvp] T015 완료
+
+**변경 파일**:
+
+- `prisma/seed.ts`: 기존 tenant·OWNER·고객 8·문의 7 에 더해 파일 metadata 4건(`FileUpload` COMPLETED + `FileItem`), 데모 공유 링크 1건(`ShareLink` + `ShareLinkFile` 2)을 고정 식별자로 upsert. `../src/lib/share-token`의 `hashShareToken` 재사용
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과
+- `pnpm lint`: 통과
+- `pnpm test`: 4 files, 24 tests 통과
+- (DB 실행 검증은 미수행 — 로컬/staging DATABASE_URL 환경 필요, T019)
+
+**후속 작업 시 주의사항**:
+
+- **metadata-only 파일**: 데모 `FileItem` 의 s3Key 는 규칙에 맞지만 실제 S3 객체는 없다. 데모에서 다운로드 시 S3 404 가 정상이다. 실제 객체가 필요하면 staging 에서 업로드한다.
+- **데모 공유 토큰 공개**: `DEMO_SHARE_TOKEN = "demo_share_techstart_0001"` → `/share/demo_share_techstart_0001` 로 공유 흐름을 시연할 수 있다. 운영 데이터에는 사용하지 않는다.
+- **idempotency**: 모든 신규 레코드는 고정 id + `update:{}` upsert 라 2회 실행 시 수·로그인 동일. 실제 2회 실행 동일 확인은 DB 연결 후 수행(T019).
+- **로그인**: `owner@demo-agency.com` / `demo1234!` (tenant `demo-agency`).
