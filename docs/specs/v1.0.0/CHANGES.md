@@ -239,3 +239,31 @@
 - **react-hooks/purity**: 서버 컴포넌트 렌더 본문에서 `Date.now()`/`Math.random()` 직접 호출은 lint 에러다. "현재 시각" 의존 로직은 컴포넌트 밖 모듈 함수로 분리한다.
 - **공유 token 1회 노출**: `createShareAction` 은 token 을 `?share=` 로 전달해 화면에 1회 표시한다. 새로고침·재방문 시 재노출되지 않는다(재생성 필요).
 - E2E(업로드~다운로드)는 T017, 실제 S3·Resend staging 검증은 T019 범위다. DEV-005 백엔드·UI 구현은 본 차수로 완료.
+
+---
+
+## [001-b2b-agency-mvp] T013 완료
+
+**변경 파일**:
+
+- `src/modules/notification/templates.tsx` (신규): `inquiry_received`·`files_shared` 두 템플릿(subject+html), `TEMPLATE_KEY` 버전, `escapeHtml`(XSS 방지). server-only 의존 없는 순수 모듈
+- `src/modules/notification/repository.ts` (신규): NotificationLog CRUD(`findByIdempotencyKey`, `createPending`, `markSent`, `markFailed`, `listNotifications`), `getTenantOwnerEmail`(OWNER 수신자)
+- `src/modules/notification/service.ts` (신규): 이중 멱등 발송(`(tenantId,idempotencyKey)` unique + Resend idempotencyKey 헤더), PENDING→SENT/FAILED, `notifyInquiryReceived`/`notifyFilesShared`
+- `src/modules/inquiry/actions.ts`: 신규 문의 접수 시 OWNER 에게 알림 트리거(비차단)
+- `src/modules/file/actions.ts`: 공유 링크 생성 시 고객에게 알림 트리거(비차단)
+- `src/modules/notification/templates.test.ts` (신규): 템플릿·이스케이프 단위 테스트 7건
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과
+- `pnpm lint`: 통과
+- `pnpm test`: 4 files, 24 tests 통과 (신규 7 + 기존 17)
+- `pnpm build`: production build 통과
+
+**후속 작업 시 주의사항**:
+
+- **비차단 알림**: 알림 발송 실패는 문의 접수·공유 생성을 막지 않는다. 실패는 `NotificationLog.status=FAILED`로 남으며 자동 재시도 worker 는 후속 spec 이다(plan 명시). 운영자 확인 화면은 미구현(필요 시 별도 태스크).
+- **이중 멱등**: `idempotencyKey`는 `inquiry_received:{inquiryId}` / `files_shared:{shareLinkId}` 규칙. DB unique 와 Resend 헤더 양쪽에서 중복 발송을 차단한다.
+- **수신자**: `inquiry_received`는 tenant OWNER(`getTenantOwnerEmail`), `files_shared`는 고객 이메일. OWNER 부재 시 `NO_RECIPIENT`로 무시된다.
+- **provider 성공·실패·중복 mock 통합 테스트**: Resend mock + DB 인프라 필요로 T016 위임. 본 차수는 순수 템플릿 단위 테스트만 포함.
+- **XSS**: 공개 문의의 사용자 입력이 메일 본문에 들어가므로 `escapeHtml` 필수. 신규 템플릿 작성 시 동일 적용.

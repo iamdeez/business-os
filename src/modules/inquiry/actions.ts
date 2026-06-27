@@ -10,6 +10,7 @@ import {
   connectInquiryToCustomer,
   disconnectInquiryFromCustomer,
 } from "./repository";
+import { notifyInquiryReceived } from "@/modules/notification/service";
 
 export type SubmitInquiryState =
   | { status: "idle" }
@@ -51,7 +52,24 @@ export async function submitInquiryAction(
   const tenant = await resolveSlug(tenantSlug);
   if (!tenant) return { status: "error", message: "존재하지 않는 에이전시입니다" };
 
-  const { id } = await submitInquiry(tenant.id, { ...parsed.data, consentedAt: new Date() });
+  const { id, created } = await submitInquiry(tenant.id, { ...parsed.data, consentedAt: new Date() });
+
+  // 신규 접수에 한해 에이전시 OWNER 에게 알림. 발송 실패가 접수를 막지 않도록 비차단 처리.
+  if (created) {
+    try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+      await notifyInquiryReceived(tenant.id, {
+        inquiryId: id,
+        companyName: parsed.data.companyName,
+        contactName: parsed.data.contactName,
+        email: parsed.data.email,
+        inquiryUrl: `${appUrl}/inquiries/${id}`,
+      });
+    } catch {
+      // 알림 실패는 무시 (NotificationLog 에 FAILED 로 남는다)
+    }
+  }
+
   return { status: "success", inquiryId: id };
 }
 
