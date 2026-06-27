@@ -78,3 +78,26 @@
 - `src/lib/db.ts`는 `DATABASE_URL`(pooler)로 `pg.Pool`을 생성하고 `PrismaPg` adapter를 통해 PrismaClient에 전달한다.
 - `prisma/seed.ts`는 `DIRECT_URL`(direct)로 연결한다. seed 실행 시 `.env`에 `DIRECT_URL`이 설정되어 있어야 한다.
 - `prisma/seed.ts`의 User 비밀번호 해시는 T004(Better Auth) 구현 단계에서 채운다. 현재는 비밀번호 없이 사용자 레코드만 생성한다.
+
+---
+
+## [001-b2b-agency-mvp] T004 완료
+
+**변경 파일**:
+
+- `src/lib/auth.ts`: Better Auth 서버 설정. Prisma adapter, 이메일·비밀번호, 공개 가입 차단(`disableSignUp: true`)
+- `src/lib/auth-client.ts`: Better Auth React 클라이언트. `signIn`, `signOut`, `useSession` export
+- `src/app/api/auth/[...all]/route.ts`: `toNextJsHandler`로 Next.js GET/POST 라우터 연결
+- `src/modules/tenant/access.ts`: `requireSession` + `requireTenantAccess` 서버 사이드 경계. 미인증·미소속 시 `/login` redirect
+- `src/modules/tenant/repository.ts`: `getTenantBySlug` 데이터 접근 헬퍼
+- `prisma/seed.ts`: `hashPassword` (better-auth/crypto)로 데모 OWNER 비밀번호 해시 후 Account 레코드 생성. Account 모델에 `@@unique([providerId, accountId])` 미존재로 `findFirst` + 조건부 `create` 패턴 사용
+- `package.json`, `pnpm-lock.yaml`: `better-auth`, `@prisma/adapter-pg`, `pg`, `@types/pg` 추가
+
+**검증 결과**:
+
+- `pnpm typecheck` (tsc --noEmit): 통과
+
+**후속 작업 시 주의사항**:
+
+- `Account` 모델에 `@@unique([providerId, accountId])` 제약이 없다. Better Auth 런타임이 중복 insert를 시도할 경우 충돌 없이 복수 레코드가 생길 수 있다. T005 이후 로그인 플로우 검증 시 스키마에 `@@unique([providerId, accountId])`를 추가하는 것을 검토한다.
+- `src/modules/tenant/access.ts`의 `requireTenantAccess`는 `membership.findFirst`로 첫 번째 소속 tenant를 반환한다. 향후 멀티 tenant 지원 시 tenant 선택 로직이 필요하다.

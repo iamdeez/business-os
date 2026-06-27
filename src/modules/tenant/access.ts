@@ -1,0 +1,29 @@
+import "server-only";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+
+export async function requireSession() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/login");
+  return session;
+}
+
+export async function requireTenantAccess() {
+  const session = await requireSession();
+
+  const membership = await db.membership.findFirst({
+    where: { userId: session.user.id },
+    include: { tenant: true },
+  });
+
+  if (!membership) redirect("/login");
+
+  return {
+    session,
+    tenantId: membership.tenantId,
+    tenant: membership.tenant,
+    role: membership.role,
+  };
+}

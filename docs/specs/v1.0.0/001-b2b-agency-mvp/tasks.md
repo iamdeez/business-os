@@ -33,7 +33,7 @@
   - 상세: plan의 데이터 모델, unique 제약과 tenant 복합 인덱스를 구현한다.
   - 완료 기준: 빈 PostgreSQL에 migration이 적용되고 Prisma Client 생성과 seed 골격 실행이 성공한다.
 
-- [ ] **T004** — Better Auth와 tenant membership 경계 구현 (T003 완료 후)
+- [x] **T004** — Better Auth와 tenant membership 경계 구현 (T003 완료 후)
   - 구현 파일: `src/lib/auth.ts`, `src/lib/auth-client.ts`, `src/app/api/auth/[...all]/route.ts`, `src/proxy.ts`, `src/modules/tenant/access.ts`, `src/modules/tenant/repository.ts`
   - 관련 요구사항: `FR-003`, `FR-004`, `NFR-001`, `NFR-002`
   - 상세: 이메일·비밀번호, 공개 가입 차단, 세션, OWNER seed와 server-side membership 검증을 구현한다.
