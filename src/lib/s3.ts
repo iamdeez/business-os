@@ -19,26 +19,5 @@ export function getS3Client(): S3Client {
 
 export const S3_BUCKET = env.AWS_S3_BUCKET;
 
-/** 허용 MIME 유형과 최대 크기 (100 MiB) */
-export const FILE_POLICY = {
-  maxBytes: 100 * 1024 * 1024,
-  allowedMime: new Set([
-    "application/pdf",
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.ms-excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "application/zip",
-  ]),
-  /** 실행 파일·스크립트·HTML은 항상 거부 */
-  blockedExtensions: new Set([
-    ".exe", ".msi", ".bat", ".cmd", ".sh", ".ps1",
-    ".html", ".htm", ".js", ".ts", ".php", ".py",
-  ]),
-} as const;
+// 파일 정책은 순수 모듈로 분리해 단위 테스트가 가능하도록 한다.
+export { FILE_POLICY } from "./file-policy";
