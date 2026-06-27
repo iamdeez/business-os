@@ -267,3 +267,25 @@
 - **수신자**: `inquiry_received`는 tenant OWNER(`getTenantOwnerEmail`), `files_shared`는 고객 이메일. OWNER 부재 시 `NO_RECIPIENT`로 무시된다.
 - **provider 성공·실패·중복 mock 통합 테스트**: Resend mock + DB 인프라 필요로 T016 위임. 본 차수는 순수 템플릿 단위 테스트만 포함.
 - **XSS**: 공개 문의의 사용자 입력이 메일 본문에 들어가므로 `escapeHtml` 필수. 신규 템플릿 작성 시 동일 적용.
+
+---
+
+## [001-b2b-agency-mvp] T014 완료
+
+**변경 파일**:
+
+- `src/modules/dashboard/queries.ts` (신규): `getDashboardData(tenantId)` — Customer·Inquiry(NEW)·FileItem count 병렬 집계 + 최근 문의 5건(생성일 desc, select 제한)
+- `src/app/(admin)/dashboard/page.tsx`: 빈 셸을 통계 카드 3개(고객사·신규 문의·파일, 각 해당 목록 링크) + 최근 문의 리스트로 교체
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과
+- `pnpm lint`: 통과
+- `pnpm test`: 4 files, 24 tests 통과
+- `pnpm build`: production build 통과
+
+**후속 작업 시 주의사항**:
+
+- **무제한 로드 금지**: 집계는 `count`, 최근 문의는 `take: 5` + `select` 로 제한한다(plan NFR). 위젯 추가 시 동일 원칙 유지.
+- **최근 문의 링크**: `/inquiries?selected={id}` 로 인박스 모달을 연다(T009 모달 패턴 재사용).
+- fixture 집계 일치 검증은 DB 필요로 T016 위임.
