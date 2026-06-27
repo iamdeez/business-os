@@ -4,16 +4,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f46e5] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4f378a] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "text-white shadow-sm active:scale-[0.98]",
+          "bg-[#4f378a] text-white shadow-sm hover:bg-[#4f378a]/90 active:scale-[0.98]",
         outline:
-          "border border-[var(--surface-border)] bg-white text-[var(--text)] hover:bg-[var(--surface-low)]",
+          "border border-[#cbc4d2] bg-white text-[#1d1b20] hover:bg-[#f8f2fa]",
         ghost:
-          "text-[var(--text-muted)] hover:bg-[var(--surface-container)] hover:text-[var(--text)]",
+          "text-[#494551] hover:bg-[#f2ecf4] hover:text-[#1d1b20]",
         destructive:
           "bg-[var(--error)] text-white hover:bg-[var(--error)]/90",
       },
@@ -40,15 +40,11 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, style, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    const gradientStyle =
-      variant === "default" || variant === undefined
-        ? { background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)", ...style }
-        : style;
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        style={gradientStyle}
+        style={style}
         {...props}
       />
     );

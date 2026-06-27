@@ -47,13 +47,13 @@
 
 ### Phase 2. 핵심 도메인 구현
 
-- [ ] **T006** — 고객사 validation·repository·actions 구현 (T003, T004 완료 후) `[P]`
+- [x] **T006** — 고객사 validation·repository·actions 구현 (T003, T004 완료 후) `[P]`
   - 구현 파일: `src/modules/crm/schema.ts`, `repository.ts`, `actions.ts`
   - 관련 요구사항: `FR-005`, `FR-006`, `NFR-001`, `NFR-007`
   - 상세: tenant-scoped CRUD, 검색, 상태 필터와 cursor pagination을 구현한다.
   - 완료 기준: 정상·validation·교차 tenant·페이지 경계 통합 테스트가 통과한다.
 
-- [ ] **T007** — 고객사 목록·등록·상세 화면 구현 (T005, T006 완료 후)
+- [x] **T007** — 고객사 목록·등록·상세 화면 구현 (T005, T006 완료 후)
   - 구현 파일: `src/app/(admin)/customers/page.tsx`, `new/page.tsx`, `[id]/page.tsx`
   - 관련 요구사항: `FR-005`, `FR-006`, `NFR-005`, `NFR-006`
   - 상세: 고객 언어 기반 폼, 검색·필터·페이지 이동과 수정 흐름을 연결한다.

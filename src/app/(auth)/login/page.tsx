@@ -48,10 +48,10 @@ export default function LoginPage() {
         style={{ background: "linear-gradient(160deg, #4f46e5 0%, #7c3aed 100%)" }}
       >
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20">
-            <span className="text-lg font-bold text-white">B</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
+            <span className="text-[13px] font-bold text-[#4F46E5]">B</span>
           </div>
-          <span className="text-xl font-semibold text-white">Business OS</span>
+          <span className="text-[28px] font-bold tracking-tight text-white">Business OS</span>
         </div>
 
         <h1 className="mb-4 text-[32px] font-semibold leading-[1.3] text-white">
@@ -74,7 +74,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right — Login form */}
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 bg-[var(--surface)]">
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 bg-white">
         {/* Mobile logo */}
         <div className="mb-8 flex items-center gap-2 md:hidden">
           <div
@@ -86,11 +86,11 @@ export default function LoginPage() {
           <span className="text-base font-semibold text-[var(--text)]">Business OS</span>
         </div>
 
-        <div className="w-full max-w-[400px]">
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-[var(--text)]">관리자 로그인</h2>
-            <p className="mt-1.5 text-sm text-[var(--text-muted)]">
-              운영 계정으로 로그인하세요
+        <div className="w-full max-w-[360px]">
+          <div className="mb-8 flex flex-col gap-2">
+            <h2 className="text-2xl font-semibold text-[#111827]">관리자 로그인</h2>
+            <p className="text-sm text-[#6b7280]">
+              업무 자동화 시스템에 오신 것을 환영합니다
             </p>
           </div>
 

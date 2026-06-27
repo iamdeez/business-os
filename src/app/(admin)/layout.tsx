@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { requireTenantAccess } from "@/modules/tenant/access";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
@@ -15,14 +14,14 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-[var(--surface)]">
       {/* Desktop sidebar */}
       <div className="hidden md:block">
-        <Sidebar />
+        <Sidebar userName={session.user.name ?? session.user.email} />
       </div>
 
       {/* Header */}
       <Header userName={session.user.name ?? session.user.email} />
 
       {/* Main content */}
-      <main className="pb-16 pt-[56px] md:ml-[240px] md:pb-0">
+      <main className="pb-16 pt-[64px] md:ml-[240px] md:pb-0">
         <div className="min-h-[calc(100vh-56px)] p-6">{children}</div>
       </main>
 

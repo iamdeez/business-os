@@ -132,3 +132,25 @@
 
 - `globals.css`의 Google Fonts `@import`는 개발 환경에서 네트워크 요청을 유발한다. 프로덕션에서는 `next/font/google`으로 교체하거나 self-hosted 방식을 고려한다.
 - `Header`의 로그아웃은 `signOut()` 후 `router.push("/login")`으로 처리한다. Better Auth 세션 쿠키 만료와 Next.js 라우터 사이의 타이밍 이슈가 발생하면 `window.location.href` 방식으로 교체한다.
+
+---
+
+## [001-b2b-agency-mvp] T006 + T007 완료
+
+**변경 파일**:
+
+- `src/modules/crm/schema.ts`: Zod v4 customerSchema (companyName, contactName, email, phone?, memo?, status)
+- `src/modules/crm/repository.ts`: `listCustomers` (검색·필터·페이지네이션), `getCustomer`, `createCustomer`, `updateCustomer`
+- `src/modules/crm/actions.ts`: `createCustomerAction` / `updateCustomerAction` — Server Action. Zod 검증 실패 시 redirect로 error 전달
+- `src/app/(admin)/customers/page.tsx`: 검색·상태 필터·페이지네이션 포함 고객 목록 테이블
+- `src/app/(admin)/customers/new/page.tsx`: 고객 등록 폼
+- `src/app/(admin)/customers/[id]/page.tsx`: 고객 상세·수정 폼. 저장 성공 시 `?updated=1` 배너 표시
+
+**검증 결과**:
+
+- `tsc --noEmit`: 통과
+
+**후속 작업 시 주의사항**:
+
+- Zod v4에서 `error.errors` → `error.issues`로 변경됨. 다른 Server Action 작성 시 동일하게 적용한다.
+- Server Action 오류 전달을 `redirect + searchParams` 방식으로 구현했다. React 19의 `useActionState`로 교체하면 클라이언트 상태를 더 세밀하게 제어할 수 있으나 T007 범위 외다.

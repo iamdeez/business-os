@@ -1,48 +1,52 @@
 "use client";
 
-import { Bell, LogOut } from "lucide-react";
-import { signOut } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { Bell, ChevronDown } from "lucide-react";
+import { usePathname } from "next/navigation";
+
+const PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "대시보드",
+  "/customers": "고객 관리",
+  "/inquiries": "문의 관리",
+  "/reservations": "예약 관리",
+  "/files": "파일 관리",
+  "/projects": "프로젝트",
+  "/settings": "설정",
+};
 
 interface HeaderProps {
   userName: string;
 }
 
 export function Header({ userName }: HeaderProps) {
-  const router = useRouter();
+  const pathname = usePathname();
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/login");
-  };
+  const title =
+    Object.entries(PAGE_TITLES).find(([key]) => pathname.startsWith(key))?.[1] ?? "";
 
   return (
-    <header className="fixed left-[240px] right-0 top-0 z-20 flex h-[56px] items-center justify-between border-b border-[var(--surface-border)] bg-white px-6">
-      <div />
+    <header className="fixed left-[240px] right-0 top-0 z-20 flex h-16 items-center justify-between border-b border-[#cbc4d2]/60 bg-white/80 px-6 backdrop-blur-md">
+      <h1 className="text-[17px] font-semibold text-[#1d1b20]">{title}</h1>
+
       <div className="flex items-center gap-3">
+        {/* Bell */}
         <button
           type="button"
           aria-label="알림"
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-low)] hover:text-[var(--text)]"
+          className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#494551] transition-colors hover:bg-[#f2ecf4]"
         >
-          <Bell className="h-4 w-4" />
+          <Bell className="h-5 w-5" />
+          <span className="absolute right-2.5 top-2 h-2 w-2 rounded-full bg-[#ba1a1a] ring-2 ring-white" />
         </button>
 
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ede9fe] text-xs font-semibold text-[var(--primary)]">
-            {userName.slice(0, 1)}
-          </div>
-          <span className="text-sm font-medium text-[var(--text)]">{userName}</span>
-        </div>
+        <div className="h-7 w-px bg-[#cbc4d2]" />
 
+        {/* User pill */}
         <button
           type="button"
-          onClick={handleSignOut}
-          aria-label="로그아웃"
-          className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs font-medium text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-low)] hover:text-[var(--text)]"
+          className="flex items-center gap-2 rounded-full border border-[#cbc4d2]/50 bg-[#f2ecf4] px-3 py-1.5 transition-colors hover:bg-[#e6e0e9]"
         >
-          <LogOut className="h-3.5 w-3.5" />
-          로그아웃
+          <span className="text-sm font-semibold text-[#1d1b20]">{userName} 님</span>
+          <ChevronDown className="h-4 w-4 text-[#494551]" />
         </button>
       </div>
     </header>
