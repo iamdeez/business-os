@@ -15,7 +15,7 @@
 
 ### Phase 1. 기반 작업
 
-- [ ] **T001** — Next.js 애플리케이션과 품질 스크립트 초기화
+- [x] **T001** — Next.js 애플리케이션과 품질 스크립트 초기화
   - 구현 파일: `package.json`, `pnpm-lock.yaml`, `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`, `postcss.config.mjs`, `src/app/*`
   - 관련 요구사항: `NFR-005`, `NFR-006`, `NFR-008`
   - 상세: Next.js 16.2 안정 계열, TypeScript, Tailwind, App Router, pnpm과 lint/typecheck/test/build 스크립트를 구성한다.
