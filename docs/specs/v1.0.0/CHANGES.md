@@ -185,3 +185,30 @@
 - **파일 정책 위치 이동**: `FILE_POLICY`가 `s3.ts` → `file-policy.ts`로 이동했다. 정책 참조는 `@/lib/file-policy` 또는 `@/lib/s3`(re-export) 어느 쪽도 가능하나, 검증 로직 추가는 순수 모듈인 `file-policy.ts`에 둔다.
 - **complete 응답 422**: S3 객체 미존재·크기 불일치는 422로 응답하고 `FileUpload.status`를 FAILED로 전이한다. T012에서 재시도 UX를 설계할 때 이 상태를 참조한다.
 - T011(공유 링크·다운로드)은 본 차수의 `FileItem`을 입력으로 사용한다.
+
+---
+
+## [001-b2b-agency-mvp] T011 완료
+
+**변경 파일**:
+
+- `src/lib/share-token.ts` (신규): 공유 토큰 생성(`randomBytes` base64url)·sha256 해시. server-only 의존 없는 순수 모듈
+- `src/modules/file/repository.ts`: `listFileItems`, `createShareLink`(transaction 내 fileItemId tenant·customer 재조회·개수 일치 검증), `findShareLinkByTokenHash`, `revokeShareLink`, `listShareLinks` 추가
+- `src/modules/file/service.ts`: `createShare`(7일 만료, token 원문 1회 반환/hash 저장), `revokeShare`, `resolveShare`(hash·폐기·만료 검증), `getDownloadUrl`(15분 presigned GET, Content-Disposition attachment) 추가
+- `src/app/api/files/download/route.ts` (신규): 공개 GET. token+fileItemId 검증 후 presigned GET 으로 302 redirect. 410(만료·폐기)/404 분기
+- `src/app/share/[token]/page.tsx` (신규): 공개 공유 화면. 유효 시 파일 목록·다운로드, 만료/폐기/미존재 안내
+- `src/lib/share-token.test.ts` (신규): 토큰 형식·해시 결정성 단위 테스트 5건
+
+**검증 결과**:
+
+- `pnpm typecheck`: 통과
+- `pnpm lint`: 통과
+- `pnpm test`: 3 files, 17 tests 통과 (신규 5 + 기존 12)
+- `pnpm build`: production build 통과 (`/api/files/download`, `/share/[token]` 생성)
+
+**후속 작업 시 주의사항**:
+
+- **통합 테스트 위임**: 유효·만료·폐기·교차 tenant·파일 미연결 검증의 통합 테스트는 DB·S3 mock 인프라가 필요하여 T016 범위다. 본 차수 단위 테스트는 순수 토큰 모듈(`share-token.ts`)만 커버한다.
+- **공유 링크 생성·폐기 UI(운영자)** 는 T012 범위다. T011은 백엔드 계약(`createShare`/`revokeShare`/`resolveShare`/`getDownloadUrl`) + 공개 다운로드 화면까지다.
+- **다운로드는 302 redirect**: `/api/files/download`는 presigned S3 URL 로 redirect 하므로 토큰이 query string 에 노출된다. MVP 공유 링크 수준에서 허용하며, 추가 보안이 필요하면 POST 본문 방식으로 전환한다.
+- **기본 만료값**: 공유 링크 7일(`SHARE_LINK_TTL_DAYS`), 다운로드 URL 15분(`DOWNLOAD_URL_TTL`). T012 에서 만료 기간 선택 UI 추가 시 이 상수를 파라미터화한다.
