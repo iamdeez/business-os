@@ -6,11 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface Props {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    companyName?: string;
+    contactName?: string;
+    email?: string;
+    phone?: string;
+  }>;
 }
 
 export default async function NewCustomerPage({ searchParams }: Props) {
-  const { error } = await searchParams;
+  const { error, companyName, contactName, email, phone } = await searchParams;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -37,13 +43,13 @@ export default async function NewCustomerPage({ searchParams }: Props) {
               <Label htmlFor="companyName">
                 회사명 <span className="text-[var(--error)]">*</span>
               </Label>
-              <Input id="companyName" name="companyName" placeholder="(주)크몽" required />
+              <Input id="companyName" name="companyName" placeholder="(주)크몽" required defaultValue={companyName} />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="contactName">
                 담당자명 <span className="text-[var(--error)]">*</span>
               </Label>
-              <Input id="contactName" name="contactName" placeholder="홍길동" required />
+              <Input id="contactName" name="contactName" placeholder="홍길동" required defaultValue={contactName} />
             </div>
           </div>
 
@@ -58,11 +64,12 @@ export default async function NewCustomerPage({ searchParams }: Props) {
                 type="email"
                 placeholder="contact@company.com"
                 required
+                defaultValue={email}
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="phone">연락처</Label>
-              <Input id="phone" name="phone" placeholder="010-1234-5678" />
+              <Input id="phone" name="phone" placeholder="010-1234-5678" defaultValue={phone} />
             </div>
           </div>
 

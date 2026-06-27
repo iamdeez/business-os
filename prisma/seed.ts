@@ -81,7 +81,120 @@ async function main() {
     });
   }
 
-  console.log("Seed complete:", { tenant: tenant.slug, user: user.email, customers: customers.length });
+  // Demo inquiries
+  const now = new Date();
+  const daysAgo = (d: number) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000);
+
+  const inquiries = [
+    {
+      id: "inq_001",
+      requestId: "req-001-techstart-web",
+      companyName: "(주)테크스타트",
+      contactName: "김민준",
+      email: "kim@techstart.co.kr",
+      phone: "010-1234-5678",
+      message: "회사 홈페이지 리뉴얼을 검토 중입니다.\n- 프로젝트 유형: 웹사이트 개발\n- 예산 범위: 1,000~2,000만원\n- 희망 일정: 2026년 8월 오픈 목표\n\n현재 홈페이지가 구형이라 모바일 대응과 전체적인 디자인 개편이 필요합니다. 포트폴리오도 함께 검토 부탁드립니다.",
+      status: "RESOLVED" as const,
+      customerId: "cust_001",
+      consentedAt: daysAgo(30),
+      createdAt: daysAgo(30),
+    },
+    {
+      id: "inq_002",
+      requestId: "req-002-designworks-brand",
+      companyName: "디자인웍스",
+      contactName: "이수연",
+      email: "lee@designworks.kr",
+      phone: "010-2345-6789",
+      message: "브랜드 아이덴티티 리브랜딩 프로젝트를 의뢰하고 싶습니다.\n- 프로젝트 유형: 브랜딩 / CI 개발\n- 예산 범위: 500~800만원\n- 희망 일정: 협의 가능\n\n로고, 색상 가이드, 명함 및 각종 서식 디자인 포함해서 견적 부탁드립니다.",
+      status: "IN_PROGRESS" as const,
+      customerId: "cust_002",
+      consentedAt: daysAgo(14),
+      createdAt: daysAgo(14),
+    },
+    {
+      id: "inq_003",
+      requestId: "req-003-green-app",
+      companyName: "(주)그린솔루션",
+      contactName: "박지훈",
+      email: "park@greensol.com",
+      phone: "010-3456-7890",
+      message: "환경 데이터 모니터링 앱 개발 의뢰드립니다.\n- 프로젝트 유형: 모바일 앱 개발 (iOS/Android)\n- 예산 범위: 3,000~5,000만원\n- 희망 일정: 2026년 10월 베타 출시\n\n실시간 대기질, 수질 데이터를 시각화하는 앱입니다. 관리자 웹 대시보드도 함께 개발을 원합니다.",
+      status: "IN_PROGRESS" as const,
+      customerId: "cust_003",
+      consentedAt: daysAgo(7),
+      createdAt: daysAgo(7),
+    },
+    {
+      id: "inq_004",
+      requestId: "req-004-smartlogis-erp",
+      companyName: "스마트로지스",
+      contactName: "정태양",
+      email: "jung@smartlogis.kr",
+      phone: "010-5678-9012",
+      message: "물류 관리 ERP 시스템 커스터마이징 문의드립니다.\n- 프로젝트 유형: 웹 시스템 개발\n- 예산 범위: 미정 (견적 요청)\n- 희망 일정: 가능한 빠르게\n\n현재 엑셀로 운영 중인 입출고, 재고, 배송 현황을 통합 관리하는 시스템이 필요합니다.",
+      status: "NEW" as const,
+      consentedAt: daysAgo(3),
+      createdAt: daysAgo(3),
+    },
+    {
+      id: "inq_005",
+      requestId: "req-005-blueocean-sns",
+      companyName: "(주)블루오션미디어",
+      contactName: "한소희",
+      email: "han@blueocean.kr",
+      phone: "010-6789-0123",
+      message: "SNS 콘텐츠 제작 및 마케팅 자동화 플랫폼 개발을 원합니다.\n- 프로젝트 유형: 웹 서비스 개발\n- 예산 범위: 2,000~3,000만원\n- 희망 일정: 2026년 9월\n\n인스타그램, 유튜브, 블로그 콘텐츠를 일괄 스케줄링하고 성과를 분석하는 툴입니다.",
+      status: "NEW" as const,
+      consentedAt: daysAgo(2),
+      createdAt: daysAgo(2),
+    },
+    {
+      id: "inq_006",
+      requestId: "req-006-datains-dashboard",
+      companyName: "(주)데이터인사이트",
+      contactName: "임채원",
+      email: "lim@datains.co.kr",
+      phone: "010-8901-2345",
+      message: "내부 데이터 분석 대시보드 구축 문의드립니다.\n- 프로젝트 유형: 데이터 시각화 / BI 대시보드\n- 예산 범위: 1,500~2,500만원\n- 희망 일정: 2026년 7월 말\n\nPostgreSQL DB에 연결하여 판매, 고객, 운영 KPI를 실시간으로 시각화하는 관리자 전용 대시보드가 필요합니다.",
+      status: "NEW" as const,
+      consentedAt: daysAgo(1),
+      createdAt: daysAgo(1),
+    },
+    {
+      id: "inq_007",
+      requestId: "req-007-newco-inquiry",
+      companyName: "퍼스트무버코리아",
+      contactName: "송하준",
+      email: "song@firstmover.kr",
+      message: "스타트업 MVP 개발 견적을 받고 싶습니다.\n- 프로젝트 유형: 웹 서비스 (MVP)\n- 예산 범위: 800~1,200만원\n- 희망 일정: 3개월 이내\n\nO2O 서비스 MVP를 빠르게 개발하고 싶습니다. 기획은 완료된 상태이며 디자인과 개발 모두 의뢰 원합니다.",
+      status: "NEW" as const,
+      consentedAt: daysAgo(0),
+      createdAt: new Date(),
+    },
+  ];
+
+  for (const inq of inquiries) {
+    const { customerId, createdAt, ...rest } = inq;
+    await db.inquiry.upsert({
+      where: { id: inq.id },
+      update: {},
+      create: {
+        ...rest,
+        tenantId: tenant.id,
+        ...(customerId ? { customerId } : {}),
+        createdAt,
+        updatedAt: createdAt,
+      },
+    });
+  }
+
+  console.log("Seed complete:", {
+    tenant: tenant.slug,
+    user: user.email,
+    customers: customers.length,
+    inquiries: inquiries.length,
+  });
 }
 
 main()
