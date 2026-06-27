@@ -1,5 +1,5 @@
 import "server-only";
-import { PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, HeadObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getS3Client, S3_BUCKET } from "@/lib/s3";
 import {
@@ -7,6 +7,7 @@ import {
   buildS3Key,
   FILE_POLICY_MESSAGE,
 } from "@/lib/file-policy";
+import { generateShareToken, hashShareToken } from "@/lib/share-token";
 import { getCustomer } from "@/modules/crm/repository";
 import type { PresignInput, CompleteInput } from "./schema";
 import {
@@ -15,6 +16,9 @@ import {
   markUploadFailed,
   findFileItemByUploadId,
   confirmUpload,
+  createShareLink,
+  findShareLinkByTokenHash,
+  revokeShareLink,
 } from "./repository";
 
 /** presigned PUT 수명 (5분) */
@@ -163,4 +167,87 @@ export async function completeUpload(
     if (!raced) throw error;
     return { ok: true, fileItem: raced };
   }
+}
+
+/** 다운로드 presigned GET 수명 (15분) */
+export const DOWNLOAD_URL_TTL = 15 * 60;
+/** 공유 링크 기본 만료 (7일) */
+export const SHARE_LINK_TTL_DAYS = 7;
+
+export type CreateShareResult =
+  | { ok: true; token: string; shareLinkId: string; expiresAt: Date }
+  | { ok: false; code: "NO_FILES" | "CUSTOMER_NOT_FOUND" | "FILE_MISMATCH"; message: string };
+
+/**
+ * 선택 FileItem 으로 공유 링크를 생성한다.
+ * token 원문은 1회만 반환하고 저장은 해시만 한다. 기본 만료 7일.
+ */
+export async function createShare(
+  tenantId: string,
+  customerId: string,
+  fileItemIds: string[]
+): Promise<CreateShareResult> {
+  const unique = [...new Set(fileItemIds)];
+  if (unique.length === 0) {
+    return { ok: false, code: "NO_FILES", message: "공유할 파일을 선택하세요" };
+  }
+
+  const customer = await getCustomer(tenantId, customerId);
+  if (!customer) {
+    return { ok: false, code: "CUSTOMER_NOT_FOUND", message: "고객사를 찾을 수 없습니다" };
+  }
+
+  const token = generateShareToken();
+  const tokenHash = hashShareToken(token);
+  const expiresAt = new Date(Date.now() + SHARE_LINK_TTL_DAYS * 24 * 60 * 60 * 1000);
+
+  const result = await createShareLink({ tenantId, customerId, fileItemIds: unique, tokenHash, expiresAt });
+  if (!result.ok) {
+    return { ok: false, code: "FILE_MISMATCH", message: "선택한 파일을 찾을 수 없습니다" };
+  }
+
+  return { ok: true, token, shareLinkId: result.link.id, expiresAt };
+}
+
+export async function revokeShare(tenantId: string, shareLinkId: string) {
+  const ok = await revokeShareLink(tenantId, shareLinkId);
+  return ok
+    ? ({ ok: true } as const)
+    : ({ ok: false, code: "NOT_FOUND", message: "공유 링크를 찾을 수 없습니다" } as const);
+}
+
+type ShareInvalid = "NOT_FOUND" | "EXPIRED" | "REVOKED";
+
+export type ResolveShareResult =
+  | { ok: true; link: NonNullable<Awaited<ReturnType<typeof findShareLinkByTokenHash>>> }
+  | { ok: false; code: ShareInvalid };
+
+/** 공개 토큰을 해석한다. hash·폐기·만료를 검증한다. */
+export async function resolveShare(token: string): Promise<ResolveShareResult> {
+  const link = await findShareLinkByTokenHash(hashShareToken(token));
+  if (!link) return { ok: false, code: "NOT_FOUND" };
+  if (link.revokedAt) return { ok: false, code: "REVOKED" };
+  if (link.expiresAt.getTime() <= Date.now()) return { ok: false, code: "EXPIRED" };
+  return { ok: true, link };
+}
+
+export type DownloadResult =
+  | { ok: true; url: string }
+  | { ok: false; code: ShareInvalid | "FILE_NOT_IN_LINK" };
+
+/** 공유 토큰·파일을 검증하고 15분 presigned GET URL 을 발급한다. */
+export async function getDownloadUrl(token: string, fileItemId: string): Promise<DownloadResult> {
+  const resolved = await resolveShare(token);
+  if (!resolved.ok) return { ok: false, code: resolved.code };
+
+  const match = resolved.link.files.find((f) => f.fileItemId === fileItemId);
+  if (!match) return { ok: false, code: "FILE_NOT_IN_LINK" };
+
+  const command = new GetObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: match.fileItem.s3Key,
+    ResponseContentDisposition: `attachment; filename="${encodeURIComponent(match.fileItem.displayName)}"`,
+  });
+  const url = await getSignedUrl(getS3Client(), command, { expiresIn: DOWNLOAD_URL_TTL });
+  return { ok: true, url };
 }

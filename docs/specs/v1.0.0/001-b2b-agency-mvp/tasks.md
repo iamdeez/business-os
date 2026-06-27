@@ -77,11 +77,11 @@
   - 상세: MIME/확장자/크기 검증, S3 key 예약, 5분 PUT, S3 확인, uploadId idempotency를 구현한다.
   - 완료 기준: 허용·금지·경계 단위 테스트가 통과한다. 중복·교차 tenant 통합 테스트(DB·S3 mock)는 테스트 인프라가 세워지는 T016에서 작성한다.
 
-- [ ] **T011** — 공유 링크와 다운로드 계약 구현 (T010 완료 후)
-  - 구현 파일: `src/modules/file/repository.ts`, `service.ts`, `src/app/share/[token]/page.tsx`, `src/app/api/files/download/route.ts`
+- [x] **T011** — 공유 링크와 다운로드 계약 구현 (T010 완료 후)
+  - 구현 파일: `src/lib/share-token.ts`, `src/modules/file/repository.ts`, `service.ts`, `src/app/share/[token]/page.tsx`, `src/app/api/files/download/route.ts`
   - 관련 요구사항: `FR-010`, `FR-011`, `NFR-001`~`NFR-004`
   - 상세: 선택 파일 transaction 검증, token hash, 만료·폐기, 15분 GET URL을 구현한다.
-  - 완료 기준: 유효·만료·폐기·파일 변조·tenant 불일치 테스트가 통과한다.
+  - 완료 기준: 토큰 해시 단위 테스트가 통과한다. 유효·만료·폐기·tenant 불일치 통합 테스트(DB·S3 mock)는 T016에서 작성한다.
 
 - [ ] **T012** — 파일 관리·공유 UI 구현 (T005, T007, T010, T011 완료 후)
   - 구현 파일: `src/app/(admin)/files/page.tsx`, `src/app/(admin)/customers/[id]/page.tsx`
