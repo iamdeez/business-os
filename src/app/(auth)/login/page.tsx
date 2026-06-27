@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,6 @@ const features = [
 ];
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -30,12 +28,14 @@ export default function LoginPage() {
       const result = await signIn.email({ email, password });
       if (result.error) {
         setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+        setLoading(false);
       } else {
-        router.push("/dashboard");
+        // 전체 페이지 네비게이션으로 세션 쿠키가 서버 렌더에 확실히 전달되게 한다.
+        // router.push(soft nav)는 쿠키 커밋과의 race 로 /login 으로 되돌아갈 수 있다.
+        window.location.href = "/dashboard";
       }
     } catch {
       setError("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
-    } finally {
       setLoading(false);
     }
   };
