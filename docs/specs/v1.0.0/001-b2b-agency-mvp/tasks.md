@@ -101,11 +101,11 @@
   - 상세: tenant별 고객·NEW 문의·파일 집계(count)와 최근 문의 5건(생성일 desc)을 표시한다.
   - 완료 기준: 쿼리·UI 구현 완료. fixture 집계 일치 검증은 T016에서 작성한다.
 
-- [ ] **T015** — B2B 에이전시 데모 seed 완성 (T003, T006, T008, T010 완료 후) `[P]`
+- [x] **T015** — B2B 에이전시 데모 seed 완성 (T003, T006, T008, T010 완료 후) `[P]`
   - 구현 파일: `prisma/seed.ts`
   - 관련 요구사항: `FR-014`
-  - 상세: tenant, OWNER, 고객사, 상태별 문의와 파일 metadata를 고정 식별자로 upsert한다.
-  - 완료 기준: seed 2회 실행 후 데이터 수와 로그인 정보가 동일하다.
+  - 상세: tenant, OWNER, 고객사 8, 상태별 문의 7, 파일 metadata 4(FileUpload+FileItem), 데모 공유 링크 1을 고정 식별자로 upsert한다.
+  - 완료 기준: 모든 레코드를 고정 id + `update:{}` upsert 로 idempotent 구현. 실제 "2회 실행 동일" 확인은 DB 연결 환경(로컬/staging)에서 수행한다(T019).
 
 ### Phase 3. 검증·배포 준비
 

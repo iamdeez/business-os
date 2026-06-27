@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { hashPassword } from "better-auth/crypto";
+import { hashShareToken } from "../src/lib/share-token";
 import "dotenv/config";
 
 const pool = new Pool({ connectionString: process.env.DIRECT_URL });
@@ -189,11 +190,77 @@ async function main() {
     });
   }
 
+  // Demo file metadata (FileUpload COMPLETED + FileItem).
+  // s3Key 규칙: {tenantId}/customers/{customerId}/{yyyy}/{mm}/{uploadId}
+  // 실제 S3 객체는 없는 metadata-only 데모 데이터다.
+  const files = [
+    { uploadId: "upl_demo_001", id: "file_001", customerId: "cust_001", displayName: "홈페이지_기획안_v2.pdf", mimeType: "application/pdf", size: 2_400_000 },
+    { uploadId: "upl_demo_002", id: "file_002", customerId: "cust_001", displayName: "와이어프레임.png", mimeType: "image/png", size: 1_100_000 },
+    { uploadId: "upl_demo_003", id: "file_003", customerId: "cust_002", displayName: "브랜드_가이드.pdf", mimeType: "application/pdf", size: 5_300_000 },
+    { uploadId: "upl_demo_004", id: "file_004", customerId: "cust_003", displayName: "앱_요구사항정의서.docx", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", size: 880_000 },
+  ];
+
+  for (const f of files) {
+    const s3Key = `${tenant.id}/customers/${f.customerId}/2026/06/${f.uploadId}`;
+    await db.fileUpload.upsert({
+      where: { uploadId: f.uploadId },
+      update: {},
+      create: {
+        uploadId: f.uploadId,
+        tenantId: tenant.id,
+        customerId: f.customerId,
+        s3Key,
+        displayName: f.displayName,
+        mimeType: f.mimeType,
+        size: f.size,
+        status: "COMPLETED",
+      },
+    });
+    await db.fileItem.upsert({
+      where: { id: f.id },
+      update: {},
+      create: {
+        id: f.id,
+        tenantId: tenant.id,
+        customerId: f.customerId,
+        uploadId: f.uploadId,
+        displayName: f.displayName,
+        s3Key,
+        size: f.size,
+        mimeType: f.mimeType,
+      },
+    });
+  }
+
+  // Demo share link (cust_001 의 file_001·file_002). 토큰 원문은 데모 용도로 공개한다.
+  const DEMO_SHARE_TOKEN = "demo_share_techstart_0001";
+  const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  await db.shareLink.upsert({
+    where: { id: "share_001" },
+    update: {},
+    create: {
+      id: "share_001",
+      tenantId: tenant.id,
+      customerId: "cust_001",
+      tokenHash: hashShareToken(DEMO_SHARE_TOKEN),
+      expiresAt: sevenDaysLater,
+    },
+  });
+  for (const fileItemId of ["file_001", "file_002"]) {
+    await db.shareLinkFile.upsert({
+      where: { shareLinkId_fileItemId: { shareLinkId: "share_001", fileItemId } },
+      update: {},
+      create: { shareLinkId: "share_001", fileItemId },
+    });
+  }
+
   console.log("Seed complete:", {
     tenant: tenant.slug,
     user: user.email,
     customers: customers.length,
     inquiries: inquiries.length,
+    files: files.length,
+    shareLink: `/share/${DEMO_SHARE_TOKEN}`,
   });
 }
 
