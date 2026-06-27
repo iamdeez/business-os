@@ -10,7 +10,7 @@ test("데모 OWNER 로그인 후 대시보드로 이동한다", async ({ page })
 test("잘못된 비밀번호는 로그인에 실패한다", async ({ page }) => {
   await page.goto("/login");
   await page.getByLabel("이메일").fill(DEMO_OWNER.email);
-  await page.getByLabel("비밀번호").fill("wrong-password");
+  await page.getByLabel("비밀번호", { exact: true }).fill("wrong-password");
   await page.getByRole("button", { name: "로그인" }).click();
   await expect(page).toHaveURL(/\/login/);
 });
