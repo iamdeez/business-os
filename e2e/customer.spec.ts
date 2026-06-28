@@ -15,7 +15,8 @@ test("고객을 생성하고 검색으로 찾을 수 있다", async ({ page }) =
   // 검색
   await page.fill('input[name="search"]', company);
   await page.keyboard.press("Enter");
-  await expect(page.getByText(company)).toBeVisible();
+  // 활성 필터 칩과 테이블 셀 양쪽에 텍스트가 있어 테이블 셀로 한정한다.
+  await expect(page.getByRole("cell", { name: company })).toBeVisible();
 });
 
 test("필수값 누락 시 고객이 생성되지 않는다", async ({ page }) => {
