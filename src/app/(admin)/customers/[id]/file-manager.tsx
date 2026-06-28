@@ -37,6 +37,8 @@ interface Props {
   shares: ShareRow[];
   shareToken?: string;
   fileError?: string;
+  // 공유 생성·폐기 후 복귀할 경로 (모달=/customers?selected=, 전체=/customers/{id})
+  returnPath: string;
 }
 
 function formatSize(bytes: number): string {
@@ -45,7 +47,7 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function FileManager({ customerId, files, shares, shareToken, fileError }: Props) {
+export function FileManager({ customerId, files, shares, shareToken, fileError, returnPath }: Props) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -197,6 +199,7 @@ export function FileManager({ customerId, files, shares, shareToken, fileError }
         <p className="py-8 text-center text-sm text-[var(--text-muted)]">업로드된 파일이 없습니다.</p>
       ) : (
         <form action={createShareAction.bind(null, customerId)}>
+          <input type="hidden" name="returnPath" value={returnPath} />
           <ul className="divide-y divide-[var(--surface-border)]">
             {files.map((file) => (
               <li key={file.id} className="flex items-center gap-3 py-3">
@@ -264,6 +267,7 @@ export function FileManager({ customerId, files, shares, shareToken, fileError }
                   {!inactive && (
                     <form action={revokeShareAction.bind(null, customerId)}>
                       <input type="hidden" name="shareLinkId" value={share.id} />
+                      <input type="hidden" name="returnPath" value={returnPath} />
                       <button
                         type="submit"
                         className="flex shrink-0 items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"

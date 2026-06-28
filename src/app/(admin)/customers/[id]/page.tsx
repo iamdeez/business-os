@@ -181,6 +181,7 @@ export default async function CustomerDetailPage({ params, searchParams }: Props
         shares={shares}
         shareToken={share}
         fileError={fileError}
+        returnPath={`/customers/${id}`}
       />
     </div>
   );

@@ -439,6 +439,7 @@ export default async function CustomersPage({ searchParams }: Props) {
               shares={toShareRows(selectedShares)}
               shareToken={params.share}
               fileError={params.fileError}
+              returnPath={modalReturnPath}
             />
           </div>
         </ModalWrapper>
