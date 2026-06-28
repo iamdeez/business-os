@@ -12,6 +12,11 @@ export function getS3Client(): S3Client {
         accessKeyId: env.AWS_ACCESS_KEY_ID,
         secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
       },
+      // S3 호환 스토리지(R2 등) 사용 시 커스텀 엔드포인트 + path-style.
+      ...(env.S3_ENDPOINT ? { endpoint: env.S3_ENDPOINT, forcePathStyle: true } : {}),
+      // 최신 aws-sdk 기본 checksum 헤더는 R2/MinIO presigned PUT 서명을 깨뜨리므로 필요 시에만 계산.
+      requestChecksumCalculation: "WHEN_REQUIRED",
+      responseChecksumValidation: "WHEN_REQUIRED",
     });
   }
   return _client;
