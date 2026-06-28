@@ -43,7 +43,7 @@
   DIRECT_URL=<supabase-session-5432> pnpm db:push
   DIRECT_URL=<supabase-session-5432> pnpm db:seed   # 데모 데이터(선택)
   ```
-- **마이그레이션 부재**: `prisma/migrations/` 가 없어 `migrate deploy` 대신 `db push`. 운영 도입 시 마이그레이션 체계로 전환 필요.
+- **마이그레이션 체계**: `prisma/migrations/` 도입 완료(`0_init`). 스키마 적용은 `pnpm exec prisma migrate deploy`(CI·운영), 개발 변경은 `pnpm db:migrate`(migrate dev). 기존 Supabase DB 는 `migrate resolve --applied 0_init` 로 baseline 처리됨.
 - 롤백: Railway 의 이전 배포로 redeploy (이미지 롤백). DB 스키마 롤백은 별도.
 
 ### 파일 스토리지 (Cloudflare R2 또는 AWS S3)
