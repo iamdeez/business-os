@@ -85,7 +85,8 @@ pnpm db:push && pnpm db:seed   # 로컬 DB 준비
 ## 7. 배포 전 확인 체크리스트
 
 - [ ] 환경별 `.env` 변수 전수 설정 (env.ts 검증 통과)
-- [ ] S3 버킷 **PUT/GET CORS** 가 운영 도메인 출처로 설정됨 (브라우저 직접 업로드)
+- [ ] S3 버킷 **PUT/GET CORS** 가 운영 도메인 출처로 설정됨 (브라우저 직접 업로드 — 설정값: `docs/specs/v1.0.0/001-b2b-agency-mvp/contracts/s3-cors.json`)
+- [ ] staging 검증 런북 수행: `docs/specs/v1.0.0/001-b2b-agency-mvp/T019-staging-verification.md`
 - [ ] tenant 데이터 격리 검증 (교차 tenant 접근 차단)
 - [ ] 마이그레이션/스키마 동기화 방식 확정 (현재 db push)
 - [ ] 민감정보가 저장소·로그·Slack에 노출되지 않음

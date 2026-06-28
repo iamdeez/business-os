@@ -410,3 +410,21 @@
 
 - **DIFF-001 미생성**: 본 spec 은 그린필드 전체 구현이라 spec 단위 diff 가 사실상 전체 코드베이스다. 전체 덤프 대신 단계별 변경을 본 `CHANGES.md`(T001~T020)와 git 히스토리(PR #1~#14)로 추적한다.
 - T019 완료 시 `.Codex/infra.md` §8 staging 제약과 본 CHANGES 에 실제 검증 증거·잔여 제약을 추가한다.
+
+---
+
+## [001-b2b-agency-mvp] T019 준비 산출물
+
+> T019 자체(실제 staging 검증)는 자격증명·배포 환경 보유 운영자가 수행한다. 본 차수는 **실행 가능하게 만드는 준비 산출물**만 제공한다.
+
+**변경 파일**:
+
+- `docs/specs/.../contracts/s3-cors.json` (신규): 브라우저 직접 업로드용 S3 버킷 PUT/GET CORS 설정 (`AllowedOrigins` 치환 필요)
+- `docs/specs/.../T019-staging-verification.md` (신규): SC-007~009·NFR-001~004 단계별 수동 검증 런북 + `E2E_S3_READY=1` 실행법 + 결과 기록 템플릿
+- `tasks.md`·`.Codex/infra.md`: 런북·CORS 산출물 참조 추가
+
+**후속 작업 시 주의사항**:
+
+- **실행·증거 = 운영자**: 런북 §7 결과 템플릿을 채워 `.Codex/infra.md` §8 와 본 CHANGES 에 반영하면 T019 가 종료된다.
+- **S3 CORS 미적용 시 업로드 실패**: `s3-cors.json` 적용이 staging 업로드의 전제 조건이다.
+- 단일 tenant seed 라 교차 tenant(NFR-001) 검증에는 두 번째 tenant 를 별도 생성해야 한다.
