@@ -4,7 +4,8 @@ import { login, DEMO_OWNER } from "./helpers";
 // SC-001 인증 흐름
 test("데모 OWNER 로그인 후 대시보드로 이동한다", async ({ page }) => {
   await login(page);
-  await expect(page.getByRole("heading", { name: "대시보드" })).toBeVisible();
+  // 헤더·본문 양쪽에 "대시보드" 제목이 있어 main 영역으로 한정한다.
+  await expect(page.getByRole("main").getByRole("heading", { name: "대시보드" })).toBeVisible();
 });
 
 test("잘못된 비밀번호는 로그인에 실패한다", async ({ page }) => {
