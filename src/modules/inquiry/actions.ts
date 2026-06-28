@@ -57,7 +57,8 @@ export async function submitInquiryAction(
   // 신규 접수에 한해 에이전시 OWNER 에게 알림. 발송 실패가 접수를 막지 않도록 비차단 처리.
   if (created) {
     try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+      // BETTER_AUTH_URL 은 런타임 값(배포 도메인). NEXT_PUBLIC_* 은 빌드 시점 인라인되어 부적합.
+      const appUrl = process.env.BETTER_AUTH_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "";
       await notifyInquiryReceived(tenant.id, {
         inquiryId: id,
         companyName: parsed.data.companyName,

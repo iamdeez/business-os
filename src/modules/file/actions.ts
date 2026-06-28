@@ -20,7 +20,8 @@ export async function createShareAction(customerId: string, formData: FormData) 
   try {
     const customer = await getCustomer(tenantId, customerId);
     if (customer) {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+      // BETTER_AUTH_URL 은 런타임 값(배포 도메인). NEXT_PUBLIC_* 은 빌드 시점 인라인되어 부적합.
+      const appUrl = process.env.BETTER_AUTH_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "";
       await notifyFilesShared(tenantId, customer.email, {
         shareLinkId: result.shareLinkId,
         customerName: customer.companyName,
