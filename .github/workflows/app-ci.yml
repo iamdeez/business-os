@@ -61,8 +61,8 @@ jobs:
       - name: Generate Prisma client
         run: pnpm db:generate
 
-      - name: Apply schema to test DB
-        run: pnpm db:push
+      - name: Apply migrations to test DB
+        run: pnpm exec prisma migrate deploy
 
       - name: Seed demo data
         run: pnpm db:seed
