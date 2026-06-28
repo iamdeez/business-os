@@ -385,3 +385,28 @@
 - **이 PR 이 검증 환경**: app-ci.yml 이 본 PR 에서 실행되어 그동안 작성만 했던 T016 service 테스트·T017 E2E 가 실제 PostgreSQL·Chromium 으로 통과하는지 처음 검증된다. 실패 시 반복 수정한다.
 - **file-share E2E**: `E2E_S3_READY` 미설정으로 CI 에서 skip. 실제 S3 검증은 T019 staging.
 - **secret 미사용**: CI 외부 env 는 더미. 실제 staging 검증(T019)은 별도 secret 환경에서 수행.
+
+---
+
+## [001-b2b-agency-mvp] T020 (현행화 차수) 완료
+
+**변경 파일**:
+
+- `.Codex/context.md`: 구현 이전 상태 기술을 현재 코드 사실로 전면 현행화 (모듈 구조·레이어·데이터 흐름·도메인 모델·외부 연동·알려진 제약·이력)
+- `.Codex/infra.md`: Supabase·S3·Resend·Better Auth 실연동, `app-ci.yml`(PostgreSQL service + E2E), db push 방식, S3 CORS·staging 미검증 제약 현행화
+- `docs/specs/.../tasks.md`: T016·T017 [x], T018 [x], T020 [~] 및 구현 완료 기준 갱신 (T019 staging 만 잔여)
+
+**검증 결과**:
+
+- `pnpm typecheck`·`pnpm lint`·`pnpm test`(53)·`pnpm build`: 통과 (T018 이후 변경 없음 — 문서·E2E 안정화만)
+- App CI(`app-ci.yml`): green (lint·typecheck·test·build·Chromium E2E)
+
+**현재 MVP 상태**:
+
+- 핵심 흐름 완성: 공개 문의 접수 → CRM → 파일 업로드/공유 → 이메일 알림 → 대시보드. 데모 seed·테스트·CI 포함.
+- **남은 작업 = T019(staging 외부 연동 수동 검증)**: 실제 S3 업로드/만료 링크·Resend 발송·교차 tenant·secret 노출 확인. 사용자 자격증명·배포 환경 필요로 별도 수행.
+
+**후속 작업 시 주의사항**:
+
+- **DIFF-001 미생성**: 본 spec 은 그린필드 전체 구현이라 spec 단위 diff 가 사실상 전체 코드베이스다. 전체 덤프 대신 단계별 변경을 본 `CHANGES.md`(T001~T020)와 git 히스토리(PR #1~#14)로 추적한다.
+- T019 완료 시 `.Codex/infra.md` §8 staging 제약과 본 CHANGES 에 실제 검증 증거·잔여 제약을 추가한다.

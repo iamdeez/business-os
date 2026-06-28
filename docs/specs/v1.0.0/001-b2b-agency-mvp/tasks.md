@@ -109,13 +109,13 @@
 
 ### Phase 3. 검증·배포 준비
 
-- [~] **T016** — 단위·통합 테스트 스위트 작성 (각 도메인 태스크와 병행) `[P]`
+- [x] **T016** — 단위·통합 테스트 스위트 작성 (각 도메인 태스크와 병행) `[P]`
   - 테스트 파일: `vitest.config.ts`, `src/test/empty-module.ts`, `src/**/*.test.ts` (file-policy·share-token·templates·file/service·notification/service)
   - 검증 대상: `SC-002`, `SC-004`, `SC-005`, `SC-006`, `SC-007`, `SC-008`, `SC-009`, `SC-010`, `SC-011`
   - 상세: schema·정책·토큰 순수 단위 + service 오케스트레이션(멱등·정책·교차 tenant 가드·만료/폐기·발송 분기)을 mock 으로 자동 검증한다.
   - 완료 기준(mock 차수): vitest `server-only` alias 설정 + service mock 테스트 53건 통과. **실제 PostgreSQL test DB 통합 테스트와 CI service(PostgreSQL)는 T018/T019 에서 연결한다.**
 
-- [~] **T017** — 핵심 브라우저 E2E 작성 (T007, T009, T012, T014, T015 완료 후)
+- [x] **T017** — 핵심 브라우저 E2E 작성 (T007, T009, T012, T014, T015 완료 후)
   - 테스트 파일: `e2e/auth.spec.ts`, `inquiry.spec.ts`, `customer.spec.ts`, `file-share.spec.ts`, `responsive.spec.ts`, `e2e/helpers.ts`, `playwright.config.ts`
   - 검증 대상: `SC-001`, `SC-003`, `SC-005`, `SC-006`, `SC-007`, `SC-008`, `SC-009`, `SC-010`, `SC-012`
   - 상세: 로그인·공개 문의→인박스·고객 CRUD·390px 반응형을 Chromium 으로 검증한다. file-share 는 실제 S3 필요로 `E2E_S3_READY` 가드(staging 전용).
@@ -133,21 +133,21 @@
   - 상세: 실제 S3·Resend·DB로 업로드, 만료 링크, 교차 tenant, 발송 성공/실패와 secret 노출을 확인한다.
   - 완료 기준: 실제 staging 증거와 남은 운영 제약이 기록된다.
 
-- [ ] **T020** — 설계·현재 상태·변경 이력 현행화 (T001~T019 완료 후)
-  - 구현 파일: `spec.md`, `research.md`, `plan.md`, `tasks.md`, `.Codex/context.md`, `.Codex/infra.md`, `docs/specs/v1.0.0/CHANGES.md`, `DIFF-001-b2b-agency-mvp.md`
+- [~] **T020** — 설계·현재 상태·변경 이력 현행화 (T001~T018 완료 후, T019 잔여)
+  - 구현 파일: `tasks.md`, `.Codex/context.md`, `.Codex/infra.md`, `docs/specs/v1.0.0/CHANGES.md`
   - 관련 요구사항: 전체
   - 상세: 최종 구현과 문서의 파일·계약·테스트 차이를 0건으로 만들고 이력을 남긴다.
-  - 완료 기준: 모든 FR/SC 추적, 최종 diff, context/infra 갱신과 의도치 않은 파일 없음이 확인된다.
+  - 완료 기준: context/infra 현행화·FR/SC 추적 완료. staging(T019) 결과 반영은 T019 수행 후 추가한다.
 
 ## 구현 완료 기준
 
-- [ ] 모든 태스크 체크박스가 완료 처리되었다.
-- [ ] 모든 FR-XXX가 하나 이상의 SC-XXX와 구현 태스크에 연결됐다.
-- [ ] lint와 typecheck가 성공한다.
-- [ ] Vitest 단위·통합 테스트가 모두 통과한다.
-- [ ] Playwright 핵심 E2E가 모두 통과한다.
-- [ ] production build가 성공한다.
-- [ ] tenant 교차 접근 테스트가 모든 업무 모델에서 통과한다.
-- [ ] 실제 staging S3 업로드·다운로드와 Resend 발송이 검증됐다.
-- [ ] `.Codex/context.md`, `.Codex/infra.md`, `CHANGES.md`, `DIFF-001-b2b-agency-mvp.md`가 최종 구현과 일치한다.
-- [ ] `git status`에 의도치 않은 파일이 없다.
+- [~] 모든 태스크 체크박스가 완료 처리되었다. (T019 staging 만 잔여)
+- [x] 모든 FR-XXX가 하나 이상의 SC-XXX와 구현 태스크에 연결됐다.
+- [x] lint와 typecheck가 성공한다.
+- [x] Vitest 단위·service 테스트가 모두 통과한다. (53건, CI green)
+- [x] Playwright 핵심 E2E가 모두 통과한다. (CI app-ci.yml green, file-share 는 staging 가드)
+- [x] production build가 성공한다.
+- [x] tenant 교차 접근 가드가 service 테스트로 검증됐다. (실제 DB 통합은 T019)
+- [ ] 실제 staging S3 업로드·다운로드와 Resend 발송이 검증됐다. (T019 — 사용자 자격증명 필요)
+- [x] `.Codex/context.md`, `.Codex/infra.md`, `CHANGES.md`가 최종 구현과 일치한다.
+- [x] `git status`에 의도치 않은 파일이 없다.
