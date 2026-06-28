@@ -128,10 +128,10 @@
   - 완료 기준: GitHub PR에서 App CI job 이 성공한다 (마이그레이션 디렉토리 부재로 `db:push` 사용).
 
 - [ ] **T019** — staging 외부 연동·보안 수동 검증 (T010, T013, T018 완료 후)
-  - 관련 문서: `.Codex/infra.md`, `docs/specs/v1.0.0/CHANGES.md`
+  - 관련 문서: `T019-staging-verification.md`(런북), `contracts/s3-cors.json`(S3 CORS), `.Codex/infra.md`, `CHANGES.md`
   - 검증 대상: `SC-007`~`SC-009`, `NFR-001`~`NFR-004`
-  - 상세: 실제 S3·Resend·DB로 업로드, 만료 링크, 교차 tenant, 발송 성공/실패와 secret 노출을 확인한다.
-  - 완료 기준: 실제 staging 증거와 남은 운영 제약이 기록된다.
+  - 상세: 런북 절차로 실제 S3·Resend·DB 업로드·만료 링크·교차 tenant·발송 성공/실패·secret 노출을 확인한다.
+  - 완료 기준: 실제 staging 증거와 남은 운영 제약이 기록된다. **(준비 완료: 런북·CORS 산출물 제공. 실행·증거는 자격증명 보유 운영자 수행)**
 
 - [~] **T020** — 설계·현재 상태·변경 이력 현행화 (T001~T018 완료 후, T019 잔여)
   - 구현 파일: `tasks.md`, `.Codex/context.md`, `.Codex/infra.md`, `docs/specs/v1.0.0/CHANGES.md`
