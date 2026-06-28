@@ -13,9 +13,9 @@
 ## 현재 단계
 
 - **단계**: Implementation / B2B 에이전시 MVP
-- **상태**: In Progress
-- **현재 초점**: `DEV-002` T004 — Better Auth + tenant membership 경계 구현
-- **다음 마일스톤**: M1 Core 기반 구현 완료 (인증·tenant·관리자 레이아웃)
+- **상태**: In Progress (핵심 구현 완료, staging 검증 T019 잔여)
+- **현재 초점**: `T019` staging 외부 연동 수동 검증 (실제 S3·Resend·DB — 사용자 자격증명 필요)
+- **다음 마일스톤**: M2 판매 가능 MVP (CRM·문의·파일·이메일·대시보드 — 구현 완료, staging 검증 후 종료)
 
 ## 성공 기준
 
