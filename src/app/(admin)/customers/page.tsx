@@ -12,9 +12,12 @@ import {
 } from "lucide-react";
 import { requireTenantAccess } from "@/modules/tenant/access";
 import { listCustomers, getCustomerStats, getCustomer } from "@/modules/crm/repository";
+import { listFileItems, listShareLinks } from "@/modules/file/repository";
 import { updateCustomerAction } from "@/modules/crm/actions";
 import { Button } from "@/components/ui/button";
 import { ModalWrapper } from "./modal-wrapper";
+import { FileManager } from "./[id]/file-manager";
+import { toFileRows, toShareRows } from "./file-rows";
 
 interface Props {
   searchParams: Promise<{
@@ -24,6 +27,9 @@ interface Props {
     selected?: string;
     updated?: string;
     error?: string;
+    share?: string;
+    revoked?: string;
+    fileError?: string;
   }>;
 }
 
@@ -39,11 +45,14 @@ export default async function CustomersPage({ searchParams }: Props) {
       : undefined;
   const selectedId = params.selected;
 
-  const [{ customers, total, totalPages }, stats, selectedCustomer] = await Promise.all([
-    listCustomers(tenantId, { page, search, status }),
-    getCustomerStats(tenantId),
-    selectedId ? getCustomer(tenantId, selectedId) : Promise.resolve(null),
-  ]);
+  const [{ customers, total, totalPages }, stats, selectedCustomer, selectedFiles, selectedShares] =
+    await Promise.all([
+      listCustomers(tenantId, { page, search, status }),
+      getCustomerStats(tenantId),
+      selectedId ? getCustomer(tenantId, selectedId) : Promise.resolve(null),
+      selectedId ? listFileItems(tenantId, selectedId) : Promise.resolve([]),
+      selectedId ? listShareLinks(tenantId, selectedId) : Promise.resolve([]),
+    ]);
 
   const activeFilters: { label: string; clearKey: string }[] = [];
   if (status)
@@ -422,6 +431,15 @@ export default async function CustomersPage({ searchParams }: Props) {
                 </button>
               </div>
             </form>
+
+            {/* 파일 업로드·공유 (전체 상세 페이지와 동일) */}
+            <FileManager
+              customerId={selectedCustomer.id}
+              files={toFileRows(selectedFiles)}
+              shares={toShareRows(selectedShares)}
+              shareToken={params.share}
+              fileError={params.fileError}
+            />
           </div>
         </ModalWrapper>
       )}
