@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { login, DEMO_TENANT_SLUG } from "./helpers";
+import { DEMO_TENANT_SLUG } from "./helpers";
 
 // SC-003 공개 문의 접수 → 관리자 인박스 노출
 test("공개 문의를 접수하면 관리자 인박스에 노출된다", async ({ page }) => {
@@ -17,8 +17,7 @@ test("공개 문의를 접수하면 관리자 인박스에 노출된다", async 
 
   await expect(page.getByRole("heading", { name: "문의가 접수되었습니다" })).toBeVisible();
 
-  // 관리자로 로그인하여 인박스에서 확인
-  await login(page);
+  // 관리자 인박스에서 확인 (storageState 로 이미 인증됨)
   await page.goto("/inquiries");
   await expect(page.getByText(company)).toBeVisible();
 });

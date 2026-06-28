@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { login } from "./helpers";
 
 // SC-007~SC-009 파일 업로드~공유~다운로드.
 // 브라우저 직접 S3 PUT 업로드는 실제 S3 + CORS 가 필요하므로 CI 기본 실행에서 제외하고,
@@ -7,7 +6,6 @@ import { login } from "./helpers";
 test.skip(!process.env.E2E_S3_READY, "실제 S3 연동 필요 — staging(T019)에서 실행");
 
 test("고객 상세에서 파일 업로드 후 공유 링크를 생성한다", async ({ page }) => {
-  await login(page);
   await page.goto("/customers");
   await page.getByRole("link", { name: "보기" }).first().click();
 

@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { login, DEMO_OWNER } from "./helpers";
 
+// 로그인 흐름 자체를 검증하므로 저장된 세션을 쓰지 않고 비인증 상태로 실행한다.
+test.use({ storageState: { cookies: [], origins: [] } });
+
 // SC-001 인증 흐름
 test("데모 OWNER 로그인 후 대시보드로 이동한다", async ({ page }) => {
   await login(page);
