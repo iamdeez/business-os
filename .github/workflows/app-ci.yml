@@ -1,0 +1,86 @@
+name: App CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: businessos_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # 로컬 PostgreSQL service (마이그레이션 디렉토리가 없어 db push 로 스키마 동기화).
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/businessos_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/businessos_test
+      BETTER_AUTH_SECRET: ci-test-secret-0123456789abcdef
+      BETTER_AUTH_URL: http://localhost:3000
+      # 외부 서비스는 더미 — DB-only E2E 는 호출하지 않는다. file-share E2E 는 E2E_S3_READY 미설정으로 skip.
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ci-test
+      AWS_SECRET_ACCESS_KEY: ci-test
+      AWS_S3_BUCKET: ci-test-bucket
+      RESEND_API_KEY: ci-test
+      EMAIL_FROM: noreply@ci.test
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Apply schema to test DB
+        run: pnpm db:push
+
+      - name: Seed demo data
+        run: pnpm db:seed
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit & service tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: pnpm test:e2e

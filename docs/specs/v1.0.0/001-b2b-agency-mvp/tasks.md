@@ -121,11 +121,11 @@
   - 상세: 로그인·공개 문의→인박스·고객 CRUD·390px 반응형을 Chromium 으로 검증한다. file-share 는 실제 S3 필요로 `E2E_S3_READY` 가드(staging 전용).
   - 완료 기준(작성 차수): 스펙·config 작성 + typecheck/lint 통과. **실제 Chromium 실행·통과는 T018 CI(PostgreSQL service + 브라우저)에서 검증한다.**
 
-- [ ] **T018** — 애플리케이션 CI 구성 (T016, T017 완료 후)
+- [x] **T018** — 애플리케이션 CI 구성 (T016, T017 완료 후)
   - 구현 파일: `.github/workflows/app-ci.yml`
   - 검증 대상: `SC-013`
-  - 상세: PostgreSQL service와 함께 lint, typecheck, unit/integration, build, E2E를 PR에서 실행한다.
-  - 완료 기준: GitHub PR에서 모든 job이 성공한다.
+  - 상세: PostgreSQL service + db push + seed 와 함께 lint, typecheck, unit/service test, build, Chromium E2E를 PR/Push에서 실행한다.
+  - 완료 기준: GitHub PR에서 App CI job 이 성공한다 (마이그레이션 디렉토리 부재로 `db:push` 사용).
 
 - [ ] **T019** — staging 외부 연동·보안 수동 검증 (T010, T013, T018 완료 후)
   - 관련 문서: `.Codex/infra.md`, `docs/specs/v1.0.0/CHANGES.md`

@@ -7,7 +7,9 @@ export const DEMO_TENANT_SLUG = "demo-agency";
 export async function login(page: Page) {
   await page.goto("/login");
   await page.getByLabel("이메일").fill(DEMO_OWNER.email);
-  await page.getByLabel("비밀번호").fill(DEMO_OWNER.password);
+  // exact: true — "비밀번호 보기" 토글 버튼(aria-label)과의 strict mode 충돌 방지
+  await page.getByLabel("비밀번호", { exact: true }).fill(DEMO_OWNER.password);
   await page.getByRole("button", { name: "로그인" }).click();
-  await expect(page).toHaveURL(/\/dashboard/);
+  // 전체 페이지 네비게이션 + CI 콜드스타트 렌더를 감안해 넉넉한 타임아웃.
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
 }

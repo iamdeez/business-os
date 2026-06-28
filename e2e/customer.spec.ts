@@ -1,9 +1,7 @@
 import { test, expect } from "@playwright/test";
-import { login } from "./helpers";
 
-// SC-005 고객 생성·검색·수정
+// SC-005 고객 생성·검색·수정 (storageState 로 인증된 컨텍스트 재사용)
 test("고객을 생성하고 검색으로 찾을 수 있다", async ({ page }) => {
-  await login(page);
   const company = `E2E고객_${Date.now()}`;
 
   await page.goto("/customers/new");
@@ -17,11 +15,11 @@ test("고객을 생성하고 검색으로 찾을 수 있다", async ({ page }) =
   // 검색
   await page.fill('input[name="search"]', company);
   await page.keyboard.press("Enter");
-  await expect(page.getByText(company)).toBeVisible();
+  // 활성 필터 칩과 테이블 셀 양쪽에 텍스트가 있어 테이블 셀로 한정한다.
+  await expect(page.getByRole("cell", { name: company })).toBeVisible();
 });
 
 test("필수값 누락 시 고객이 생성되지 않는다", async ({ page }) => {
-  await login(page);
   await page.goto("/customers/new");
   // 회사명만 입력하고 저장 → 브라우저 required 검증으로 제출되지 않거나 동일 페이지 유지
   await page.fill('input[name="companyName"]', "불완전고객");
