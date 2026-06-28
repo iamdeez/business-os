@@ -33,19 +33,25 @@
 
 ## 3. 배포 방식
 
-### 빌드·실행
+### 컨테이너 (Railway)
 
-```bash
-pnpm install --frozen-lockfile
-pnpm db:generate        # Prisma Client
-pnpm db:push            # 스키마 동기화 (마이그레이션 디렉토리 없음)
-pnpm db:seed            # 데모 데이터 (선택)
-pnpm build              # Next.js production build
-pnpm start              # production 서버 (NODE_ENV=production)
-```
+- **호스트**: Railway. `Dockerfile`(멀티스테이지, Next standalone 출력) 로 빌드·배포한다.
+- **이미지**: `node:24-slim` 런타임에 `.next/standalone` + static + public 만 포함(경량). `@prisma/client`·`pg` 는 추적 복사, `@prisma/adapter-pg` 는 번들 인라인. 비루트(`nextjs`) 실행, `node server.js` (PORT·HOSTNAME 환경변수 준수, Railway 가 PORT 주입).
+- **환경변수**: Railway 프로젝트 Variables 에 §3 필수 환경변수 전체 주입. 빌드 시점엔 Dockerfile 의 placeholder 로 통과하고 런타임 값으로 동작한다.
+- **스키마·seed (별도, 1회)**: DB 는 외부(Supabase)이므로 컨테이너가 아니라 로컬/CI 에서 Supabase 에 적용한다.
+  ```bash
+  DIRECT_URL=<supabase-session-5432> pnpm db:push
+  DIRECT_URL=<supabase-session-5432> pnpm db:seed   # 데모 데이터(선택)
+  ```
+- **마이그레이션 부재**: `prisma/migrations/` 가 없어 `migrate deploy` 대신 `db push`. 운영 도입 시 마이그레이션 체계로 전환 필요.
+- 롤백: Railway 의 이전 배포로 redeploy (이미지 롤백). DB 스키마 롤백은 별도.
 
-- **마이그레이션 부재**: `prisma/migrations/` 가 없어 `prisma migrate deploy` 대신 `db push` 로 스키마를 적용한다. 운영 도입 시 마이그레이션 체계로 전환 필요.
-- 배포 대상 플랫폼·롤백 절차는 미정(staging 미구성, T019).
+### 파일 스토리지 (Cloudflare R2 또는 AWS S3)
+
+- 코드는 S3 호환. `S3_ENDPOINT` 설정 시 R2(`region=auto`, path-style, checksum WHEN_REQUIRED), 미설정 시 AWS S3.
+- **버킷 CORS 필수**: 브라우저 직접 PUT 업로드 때문에 운영 도메인 출처로 PUT/GET CORS 설정. 설정값: `docs/specs/v1.0.0/001-b2b-agency-mvp/contracts/s3-cors.json`.
+  - AWS: `aws s3api put-bucket-cors`
+  - R2: 대시보드 버킷 → Settings → CORS Policy 에 동일 JSON 적용
 
 ### 필수 환경변수 (`.env.example` 기준)
 
@@ -110,3 +116,4 @@ pnpm db:push && pnpm db:seed   # 로컬 DB 준비
 | 2026-06-28 | `PR #1` | GitHub 저장소와 PR 정책 검사 구성 | PM-002 |
 | 2026-06-28 | `DEV-001` | Node.js·pnpm·Next.js 로컬 실행 및 품질 명령 구성 | SPEC-001/T001 |
 | 2026-06-28 | `0783948` | Supabase·S3·Resend·Better Auth 연동, app-ci.yml(PostgreSQL+E2E), db push 방식·S3 CORS 제약 현행화 | SPEC-001/T020 |
+| 2026-06-28 | `OPS-009` | Railway 배포(Dockerfile·standalone), Cloudflare R2(S3_ENDPOINT) 지원, R2/S3 CORS 적용법 추가 | OPS-009 |
