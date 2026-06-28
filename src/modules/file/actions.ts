@@ -6,14 +6,20 @@ import { getCustomer } from "@/modules/crm/repository";
 import { notifyFilesShared } from "@/modules/notification/service";
 import { createShare, revokeShare } from "./service";
 
+// returnPath(모달=/customers?selected=, 전체=/customers/{id}) 로 복귀하며 파라미터를 덧붙인다.
+function resolveReturn(formData: FormData, customerId: string, param: string) {
+  const base = (formData.get("returnPath") as string) || `/customers/${customerId}`;
+  const sep = base.includes("?") ? "&" : "?";
+  return `${base}${sep}${param}`;
+}
+
 export async function createShareAction(customerId: string, formData: FormData) {
   const { tenantId } = await requireTenantAccess();
   const fileItemIds = formData.getAll("fileItemId").map(String).filter(Boolean);
 
   const result = await createShare(tenantId, customerId, fileItemIds);
-  const base = `/customers/${customerId}`;
   if (!result.ok) {
-    redirect(`${base}?fileError=${encodeURIComponent(result.message)}#files`);
+    redirect(resolveReturn(formData, customerId, `fileError=${encodeURIComponent(result.message)}`));
   }
 
   // 고객에게 공유 알림. 발송 실패가 공유 생성을 막지 않도록 비차단 처리.
@@ -35,7 +41,7 @@ export async function createShareAction(customerId: string, formData: FormData) 
   }
 
   // token 원문은 1회만 노출된다. 운영자가 즉시 복사하도록 화면에 표시한다.
-  redirect(`${base}?share=${encodeURIComponent(result.token)}#files`);
+  redirect(resolveReturn(formData, customerId, `share=${encodeURIComponent(result.token)}`));
 }
 
 export async function revokeShareAction(customerId: string, formData: FormData) {
@@ -43,5 +49,5 @@ export async function revokeShareAction(customerId: string, formData: FormData) 
   const shareLinkId = String(formData.get("shareLinkId"));
 
   await revokeShare(tenantId, shareLinkId);
-  redirect(`/customers/${customerId}?revoked=1#files`);
+  redirect(resolveReturn(formData, customerId, "revoked=1"));
 }
