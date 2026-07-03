@@ -4,4 +4,4 @@ import { createAuthClient } from "better-auth/react";
 // NEXT_PUBLIC_APP_URL 은 빌드 시점 인라인되어 배포 도메인과 불일치(CORS) 를 유발하므로 쓰지 않는다.
 export const authClient = createAuthClient();
 
-export const { signIn, signOut, useSession } = authClient;
+export const { signIn, signUp, signOut, useSession } = authClient;
