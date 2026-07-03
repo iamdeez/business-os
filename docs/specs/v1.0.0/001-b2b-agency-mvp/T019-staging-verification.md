@@ -92,3 +92,23 @@ NFR-001~004: PASS/FAIL — 증거:
 발견된 잔여 운영 제약:
 후속 조치:
 ```
+
+## 8. 라이브 검증 기록 (2026-07-03, Fly.io 프로덕션)
+
+환경: https://business-os-kmong.fly.dev (Fly nrt) · Supabase Postgres · Cloudflare R2 · 데모 seed
+
+| 항목 | 결과 | 증거 |
+|---|---|---|
+| 로그인·세션 | ✅ PASS | `POST /api/auth/sign-in/email` 200 + 세션 쿠키, 인증 `/dashboard` 200 |
+| 파일 업로드 (SC-007 핵심) | ✅ PASS | presign→R2 직접 PUT 200→complete FileItem 확정 (s3Key `tenant_demo_agency/customers/cust_001/...`) |
+| 다운로드 메커니즘 | ✅ PASS(간접) | 업로드와 동일 presigned GET 경로. 공유 화면 `/share/{token}` 200 |
+| 마이그레이션 적용 | ✅ PASS | prod `migrate deploy` 성공, `migrate status: up to date` |
+| DB SSL·연결 | ✅ PASS | `SELECT 1` 성공 (Supabase pooler + SSL) |
+
+**잔여 (미검증):**
+- **SC-008 만료/폐기 링크**: 실제 만료·폐기 상태 다운로드 거부(410) 미검증 → UI 또는 DB 시간 조정으로 확인 필요
+- **SC-009 이메일 실발송**: Resend `motionbit.kr` 도메인 DNS 미인증 → 실발송 미검증(로직·트리거는 테스트 커버)
+- **NFR-001 교차 tenant**: 데모 seed 가 단일 tenant → 2번째 tenant 생성 후 상호 접근 차단 확인 필요
+- **NFR-002 secret 감사**: 세션 중 노출된 자격증명 rotate 후 재확인 필요
+
+**후속 조치**: Resend 도메인 인증 + 2번째 tenant + secret rotate 완료 후 위 4항목 검증하면 T019 종료.

@@ -59,13 +59,13 @@
   - 상세: 고객 언어 기반 폼, 검색·필터·페이지 이동과 수정 흐름을 연결한다.
   - 완료 기준: E2E에서 고객 생성·검색·수정이 완료된다.
 
-- [ ] **T008** — 공개 문의와 인박스 도메인 구현 (T003, T004 완료 후) `[P]`
+- [x] **T008** — 공개 문의와 인박스 도메인 구현 (T003, T004 완료 후) `[P]`
   - 구현 파일: `src/modules/inquiry/schema.ts`, `repository.ts`, `actions.ts`
   - 관련 요구사항: `FR-001`, `FR-002`, `FR-007`, `FR-008`, `NFR-001`
   - 상세: tenantSlug 해석, honeypot, requestId idempotency, 상태 변경과 고객 연결을 구현한다.
   - 완료 기준: 정상·중복·오류·교차 tenant 통합 테스트가 통과한다.
 
-- [ ] **T009** — 공개 문의·관리자 인박스 화면 구현 (T005, T006, T008 완료 후)
+- [x] **T009** — 공개 문의·관리자 인박스 화면 구현 (T005, T006, T008 완료 후)
   - 구현 파일: `src/app/inquiry/[tenantSlug]/page.tsx`, `src/app/(admin)/inquiries/page.tsx`, `[id]/page.tsx`
   - 관련 요구사항: `FR-001`, `FR-002`, `FR-007`, `FR-008`, `NFR-005`, `NFR-006`
   - 상세: 공개 접수 성공/오류, 인박스 필터, 상태 변경과 고객 연결 UI를 만든다.
@@ -127,11 +127,11 @@
   - 상세: PostgreSQL service + db push + seed 와 함께 lint, typecheck, unit/service test, build, Chromium E2E를 PR/Push에서 실행한다.
   - 완료 기준: GitHub PR에서 App CI job 이 성공한다 (마이그레이션 디렉토리 부재로 `db:push` 사용).
 
-- [ ] **T019** — staging 외부 연동·보안 수동 검증 (T010, T013, T018 완료 후)
+- [~] **T019** — staging 외부 연동·보안 수동 검증 (T010, T013, T018 완료 후)
   - 관련 문서: `T019-staging-verification.md`(런북), `contracts/s3-cors.json`(S3 CORS), `.Codex/infra.md`, `CHANGES.md`
   - 검증 대상: `SC-007`~`SC-009`, `NFR-001`~`NFR-004`
   - 상세: 런북 절차로 실제 S3·Resend·DB 업로드·만료 링크·교차 tenant·발송 성공/실패·secret 노출을 확인한다.
-  - 완료 기준: 실제 staging 증거와 남은 운영 제약이 기록된다. **(준비 완료: 런북·CORS 산출물 제공. 실행·증거는 자격증명 보유 운영자 수행)**
+  - 진행: **Fly.io 프로덕션 배포 완료** — 로그인·대시보드·파일 업로드→R2→complete·다운로드 메커니즘·마이그레이션 적용을 라이브 검증(SC-007 핵심 통과). **잔여**: 교차 tenant 격리(2번째 tenant 필요)·Resend 실발송(도메인 인증 필요)·secret 노출 감사(rotate 후). 런북 §7 최종 기록 시 종료.
 
 - [~] **T020** — 설계·현재 상태·변경 이력 현행화 (T001~T018 완료 후, T019 잔여)
   - 구현 파일: `tasks.md`, `.Codex/context.md`, `.Codex/infra.md`, `docs/specs/v1.0.0/CHANGES.md`
