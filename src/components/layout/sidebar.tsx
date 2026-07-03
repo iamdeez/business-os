@@ -6,9 +6,7 @@ import {
   LayoutDashboard,
   Users,
   MessageSquare,
-  CalendarDays,
   FolderOpen,
-  Kanban,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -18,10 +16,8 @@ import { signOut } from "@/lib/auth-client";
 const navItems = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
   { href: "/customers", label: "고객 관리", icon: Users },
-  { href: "/inquiries", label: "문의 관리", icon: MessageSquare, badge: 3 },
-  { href: "/reservations", label: "예약 관리", icon: CalendarDays },
+  { href: "/inquiries", label: "문의 관리", icon: MessageSquare },
   { href: "/files", label: "파일 관리", icon: FolderOpen },
-  { href: "/projects", label: "프로젝트", icon: Kanban },
 ];
 
 interface SidebarProps {
@@ -64,11 +60,6 @@ export function Sidebar({ userName }: SidebarProps) {
             >
               <item.icon className="h-[18px] w-[18px] shrink-0" />
               <span className="flex-1">{item.label}</span>
-              {item.badge ? (
-                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#ba1a1a] px-1.5 text-[10px] font-bold text-white">
-                  {item.badge}
-                </span>
-              ) : null}
             </Link>
           );
         })}

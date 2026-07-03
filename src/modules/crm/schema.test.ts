@@ -16,8 +16,13 @@ describe("customerSchema", () => {
   });
 
   it("status 미지정 시 ACTIVE 기본값", () => {
-    const { status: _status, ...rest } = valid;
-    const r = customerSchema.safeParse(rest);
+    const r = customerSchema.safeParse({
+      companyName: "ACME",
+      contactName: "홍길동",
+      email: "a@b.com",
+      phone: "",
+      memo: "",
+    });
     expect(r.success).toBe(true);
     if (r.success) expect(r.data.status).toBe("ACTIVE");
   });
@@ -33,8 +38,14 @@ describe("customerSchema", () => {
 
   it("phone·memo 는 빈 문자열/미지정 모두 허용", () => {
     expect(customerSchema.safeParse({ ...valid, phone: "", memo: "" }).success).toBe(true);
-    const { phone: _p, memo: _m, ...rest } = valid;
-    expect(customerSchema.safeParse(rest).success).toBe(true);
+    expect(
+      customerSchema.safeParse({
+        companyName: "ACME",
+        contactName: "홍길동",
+        email: "a@b.com",
+        status: "ACTIVE",
+      }).success
+    ).toBe(true);
   });
 
   it("status enum 외 값을 거부한다", () => {
