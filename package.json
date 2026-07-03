@@ -18,7 +18,7 @@
     "test:e2e": "playwright test",
     "screenshots": "node scripts/capture-screenshots.mjs",
     "demo:record": "node scripts/record-demo.mjs",
-    "demo:gif": "ffmpeg -y -i docs/demo-video/demo.webm -vf \"fps=12,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse=dither=bayer\" docs/demo.gif",
+    "demo:gif": "ffmpeg -y -ss 1 -i docs/demo-video/demo.webm -vf \"fps=12,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse=dither=bayer\" docs/demo.gif",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
