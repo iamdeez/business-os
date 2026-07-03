@@ -37,7 +37,8 @@ export function InquiryLink({ slug }: { slug: string }) {
           readOnly
           value={url}
           aria-label="공개 문의 링크"
-          className="flex-1 rounded-lg border border-[#cbc4d2] bg-[#f8f2fa] px-3 py-2 text-xs text-[#1d1b20]"
+          // min-w-0: flex 자식이 콘텐츠 폭 이하로 줄어들 수 있게 해 모바일 가로 overflow 방지
+          className="min-w-0 flex-1 rounded-lg border border-[#cbc4d2] bg-[#f8f2fa] px-3 py-2 text-xs text-[#1d1b20]"
         />
         <button
           type="button"
