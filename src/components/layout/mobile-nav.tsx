@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Users,
   MessageSquare,
-  CalendarDays,
   FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +14,6 @@ const mobileNavItems = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
   { href: "/customers", label: "고객", icon: Users },
   { href: "/inquiries", label: "문의", icon: MessageSquare },
-  { href: "/reservations", label: "예약", icon: CalendarDays },
   { href: "/files", label: "파일", icon: FolderOpen },
 ];
 
