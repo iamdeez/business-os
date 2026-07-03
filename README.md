@@ -14,6 +14,7 @@
 
 ## 📌 목차
 
+- [스크린샷](#스크린샷)
 - [무엇을 해결하나](#무엇을-해결하나)
 - [핵심 기능](#핵심-기능)
 - [기술 스택](#기술-스택)
@@ -23,6 +24,29 @@
 - [배포·운영](#배포운영)
 - [로컬 개발](#로컬-개발)
 - [로드맵](#로드맵)
+
+---
+
+## 스크린샷
+
+| 대시보드 | 고객 관리 |
+|---|---|
+| ![대시보드](docs/screenshots/04-dashboard.png) | ![고객 관리](docs/screenshots/05-customers.png) |
+| **문의 인박스** | **고객 상세 · 파일 공유** |
+| ![문의 인박스](docs/screenshots/07-inquiries.png) | ![파일 공유](docs/screenshots/06-customer-files.png) |
+
+<details>
+<summary>랜딩 · 가입 · 공개 문의/공유 · 모바일 더 보기</summary>
+
+| 랜딩 | 회원가입 |
+|---|---|
+| ![랜딩](docs/screenshots/01-landing.png) | ![회원가입](docs/screenshots/03-signup.png) |
+| **공개 문의 폼(고객 시점)** | **공개 공유 화면(고객 시점)** |
+| ![공개 문의](docs/screenshots/08-public-inquiry.png) | ![공개 공유](docs/screenshots/09-public-share.png) |
+| **모바일 대시보드** | **로그인** |
+| ![모바일](docs/screenshots/10-mobile-dashboard.png) | ![로그인](docs/screenshots/02-login.png) |
+
+</details>
 
 ---
 
