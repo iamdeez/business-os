@@ -1,5 +1,11 @@
 # Business OS
 
+[![App CI](https://github.com/iamdeez/business-os/actions/workflows/app-ci.yml/badge.svg)](https://github.com/iamdeez/business-os/actions/workflows/app-ci.yml)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma%207-336791?logo=postgresql&logoColor=white)
+![Deploy](https://img.shields.io/badge/Deploy-Fly.io-8b5cf6)
+
 > B2B 에이전시를 위한 **멀티테넌트 업무 운영 SaaS** — 고객 문의 접수부터 CRM·파일 공유·이메일 알림·현황 대시보드까지 하나의 흐름으로 연결합니다.
 
 **🔗 라이브 데모: https://business-os-kmong.fly.dev**
@@ -9,6 +15,12 @@
 | 바로 둘러보기(데모 데이터) | `owner@demo-agency.com` / `demo1234!` |
 | 직접 워크스페이스 만들기 | `/signup` 에서 가입 → 내 전용 워크스페이스 자동 생성 |
 | 공개 문의 폼(고객 시점) | `/inquiry/demo-agency` |
+
+### 데모 미리보기
+
+![Business OS 데모](docs/demo.gif)
+
+> 랜딩 → 로그인 → 대시보드 → 고객·파일 → 문의 인박스 → 공개 문의 폼 흐름 (Playwright 자동 녹화)
 
 ---
 
