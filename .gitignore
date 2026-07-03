@@ -32,3 +32,6 @@ tmp/
 
 # AI scratch files
 **/_ai-workspace/
+
+# 데모 녹화 중간 산출물(webm) — GIF만 커밋
+docs/demo-video/
