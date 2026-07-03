@@ -3,6 +3,7 @@ import { Users, MessageSquare, FolderOpen, ArrowRight } from "lucide-react";
 import { requireTenantAccess } from "@/modules/tenant/access";
 import { getDashboardData } from "@/modules/dashboard/queries";
 import type { InquiryStatus } from "@/modules/inquiry/schema";
+import { InquiryLink } from "./inquiry-link";
 
 const STATUS_LABEL: Record<InquiryStatus, string> = {
   NEW: "신규",
@@ -17,7 +18,7 @@ const STATUS_STYLE: Record<InquiryStatus, string> = {
 };
 
 export default async function DashboardPage() {
-  const { tenantId } = await requireTenantAccess();
+  const { tenantId, tenant } = await requireTenantAccess();
   const { customerCount, newInquiryCount, fileCount, recentInquiries } =
     await getDashboardData(tenantId);
 
@@ -30,6 +31,9 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold text-[#1d1b20]">대시보드</h1>
+
+      {/* 공개 문의 링크 */}
+      <InquiryLink slug={tenant.slug} />
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
